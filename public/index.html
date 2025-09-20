@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="She Nurtures - Your compassionate AI guide for reproductive health information">
+    <meta name="keywords" content="PCOS, PCOD, reproductive health, women's health, AI assistant">
+    <title>She Nurtures - AI Health Assistant</title>
+    
+    <!-- Preconnect to external resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Favicon (you should add this) -->
+    <link rel="icon" type="image/png" href="/favicon.png">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Initializing She Nurtures AI...</p>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="/logo.png" alt="She Nurtures Logo" class="logo" onerror="this.style.display='none'">
+                    <h1 class="app-title">She Nurtures</h1>
+                </div>
+                <div class="header-actions">
+                    <button id="info-button" class="icon-button" aria-label="Information">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Avatar Section -->
+            <div class="avatar-section">
+                <div class="avatar-container">
+                    <div class="avatar-wrapper">
+                        <div id="avatar-placeholder" class="avatar-placeholder">
+                            <img src="https://raw.githubusercontent.com/uppal-bhumik/my-assets/main/she%20nurtures.png" 
+                                 alt="She Nurtures Avatar" 
+                                 class="avatar-image">
+                        </div>
+                    </div>
+                    <div class="avatar-status">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Ready to help</span>
+                    </div>
+                </div>
+                
+                <div class="welcome-message">
+                    <h2>Welcome to She Nurtures</h2>
+                    <p>Your compassionate AI guide for reproductive health information</p>
+                </div>
+            </div>
+
+            <!-- Mode Selection -->
+            <div class="mode-selection">
+                <div class="mode-selector">
+                    <button id="general-mode-btn" class="mode-button active" data-mode="general">
+                        <div class="mode-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="mode-details">
+                            <h3>General Guide</h3>
+                            <p>Ask any questions about PCOS, PCOD, and reproductive health</p>
+                        </div>
+                    </button>
+                    
+                    <button id="symptom-mode-btn" class="mode-button" data-mode="symptom">
+                        <div class="mode-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="mode-details">
+                            <h3>Symptom Checker</h3>
+                            <p>Get guided information based on specific symptoms</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Section -->
+            <div class="chat-section">
+                <!-- General Mode Content -->
+                <div id="general-mode-content" class="mode-content active">
+                    <!-- Chat Messages Container -->
+                    <div id="chat-messages" class="chat-messages">
+                        <!-- Initial welcome message -->
+                        <div class="message ai-message">
+                            <div class="message-content">
+                                <p>Hello! I'm here to provide supportive information about PCOS, PCOD, and reproductive health. Feel free to ask me anything!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Suggested Questions -->
+                    <div class="suggested-questions">
+                        <p class="suggestions-title">You can ask about:</p>
+                        <div class="suggestion-chips">
+                            <button class="suggestion-chip" data-question="What is PCOS?">What is PCOS?</button>
+                            <button class="suggestion-chip" data-question="Common symptoms of PCOD">PCOD Symptoms</button>
+                            <button class="suggestion-chip" data-question="Lifestyle tips for hormonal balance">Lifestyle Tips</button>
+                            <button class="suggestion-chip" data-question="When should I see a doctor?">When to See a Doctor</button>
+                        </div>
+                    </div>
+
+                    <!-- General Mode Input -->
+                    <div class="input-section">
+                        <div class="input-wrapper">
+                            <input 
+                                type="text" 
+                                id="general-input" 
+                                placeholder="Ask about PCOS, PCOD, or reproductive health..."
+                                maxlength="500"
+                                aria-label="Your question">
+                            <div class="input-actions">
+                                <span id="general-char-count" class="char-count">0/500</span>
+                                <button id="general-clear-button" class="icon-button small" aria-label="Clear input" style="display: none;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <button id="general-ask-button" class="ask-button">
+                            <span class="button-text">Ask Question</span>
+                            <svg class="button-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Symptom Checker Mode Content -->
+                <div id="symptom-mode-content" class="mode-content">
+                    <div class="symptom-checker">
+                        <div class="symptom-intro">
+                            <h3>Symptom Information Guide</h3>
+                            <p>Select the symptoms you're experiencing to get informational guidance. This is not a medical diagnosis.</p>
+                        </div>
+
+                        <form id="symptom-form" class="symptom-form">
+                            <div class="symptom-categories">
+                                <!-- Menstrual Symptoms -->
+                                <div class="symptom-category">
+                                    <h4>Menstrual Health</h4>
+                                    <div class="symptom-options">
+                                        <label class="symptom-option">
+                                            <input type="checkbox" name="symptom" value="irregular_periods">
+                                            <span class="checkmark"></span>
+                                            <div class="symptom-info">
+                                                <strong>Irregular Periods</strong>
+                                                <small>Cycles longer than 35 days or shorter than 21 days</small>
+                                            </div>
+                                        </label>
+                                        <label class="symptom-option">
+                                            <input type="checkbox" name="symptom" value="missed_periods">
+                                            <span class="checkmark"></span>
+                                            <div class="symptom-info">
+                                                <strong>Missed Periods</strong>
+                                                <small>No menstruation for 3+ months</small>
+                                            </div>
+                                        </label>
+                                        <label class="symptom-option">
+                                            <input type="checkbox" name="symptom" value="heavy_periods">
+                                            <span class="checkmark"></span>
+                                            <div class="symptom-info">
+                                                <strong>Heavy Periods</strong>
+                                                <small>Excessive menstrual bleeding</small>
+                                            </div>
+                                        </label>
+                                        <label class="symptom-option">
+                                            <input type="checkbox" name="symptom" value="painful_periods">
+                                            <span class="checkmark"></span>
+                                            <div class="symptom-info">
+                                                <strong>Painful Periods</strong>
+                                                <small>Severe menstrual cramps</small>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Physical Symptoms -->
+                                <div class="symptom-category">
+                                    <h4>Physical Symptoms</h4>
+                                    <div class="symptom-options">
+                                        <label class="symptom-option">
+                                            <input type="checkbox" name="symptom" value="weight_gain">
+                                            <span class="checkmark"></span>
+                                            <div class="symptom-info">
+                                                <strong>Unexplained Weight Gain</strong>
+                                                <small>Difficulty losing weight or sudden weight increase</small>
+                                            </div>
+                                        </label>
+                                        <label class="symptom-option">
+                                            <input type="checkbox" name="symptom" value="acne">
+                                            <span class="checkmark"></span>
+                                            <div class="symptom-info">
+                                                <strong>Acne or Skin Issues</strong>
+                                                <small>Adult acne, oily skin, or darkened skin patches</small>
+                                            </div>
+                                        </label>
+                                        <label class="symptom-option">
+                                            <input type="checkbox" name="symptom" value="hair_growth">
+                                            <span class="checkmark"></span>
+                                            <div class="symptom-info">
+                                                <strong>Excess Hair Growth</strong>
+                                                <small>Unwanted hair on face, chest, or back</small>
+                                            </div>
+                                        </label>
+                                        <label class="symptom-option">
+                                            <input type="checkbox" name="symptom" value="hair_loss">
+                                            <span class="checkmark"></span>
+                                            <div class="symptom-info">
+                                                <strong>Hair Thinning/Loss</strong>
+                                                <small>Male-pattern baldness or thinning hair</small>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Energy & Mood -->
+                                <div class="symptom-category">
+                                    <h4>Energy & Mood</h4>
+                                    <div class="symptom-options">
+                                        <label class="symptom-option">
+                                            <input type="checkbox" name="symptom" value="fatigue">
+                                            <span class="checkmark"></span>
+                                            <div class="symptom-info">
+                                                <strong>Chronic Fatigue</strong>
+                                                <small>Persistent tiredness or low energy</small>
+                                            </div>
+                                        </label>
+                                        <label class="symptom-option">
+                                            <input type="checkbox" name="symptom" value="mood_changes">
+                                            <span class="checkmark"></span>
+                                            <div class="symptom-info">
+                                                <strong>Mood Changes</strong>
+                                                <small>Depression, anxiety, or mood swings</small>
+                                            </div>
+                                        </label>
+                                        <label class="symptom-option">
+                                            <input type="checkbox" name="symptom" value="sleep_issues">
+                                            <span class="checkmark"></span>
+                                            <div class="symptom-info">
+                                                <strong>Sleep Problems</strong>
+                                                <small>Difficulty falling asleep or staying asleep</small>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Other Symptoms -->
+                                <div class="symptom-category">
+                                    <h4>Other Concerns</h4>
+                                    <div class="symptom-options">
+                                        <label class="symptom-option">
+                                            <input type="checkbox" name="symptom" value="fertility_issues">
+                                            <span class="checkmark"></span>
+                                            <div class="symptom-info">
+                                                <strong>Fertility Concerns</strong>
+                                                <small>Difficulty conceiving</small>
+                                            </div>
+                                        </label>
+                                        <label class="symptom-option">
+                                            <input type="checkbox" name="symptom" value="cravings">
+                                            <span class="checkmark"></span>
+                                            <div class="symptom-info">
+                                                <strong>Food Cravings</strong>
+                                                <small>Intense cravings, especially for carbs</small>
+                                            </div>
+                                        </label>
+                                        <label class="symptom-option">
+                                            <input type="checkbox" name="symptom" value="headaches">
+                                            <span class="checkmark"></span>
+                                            <div class="symptom-info">
+                                                <strong>Frequent Headaches</strong>
+                                                <small>Regular headaches or migraines</small>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" id="clear-symptoms" class="secondary-button">
+                                    Clear Selection
+                                </button>
+                                <button type="submit" id="analyze-symptoms" class="ask-button" disabled>
+                                    <span class="button-text">Get Information</span>
+                                    <svg class="button-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Symptom Results -->
+                        <div id="symptom-results" class="symptom-results" style="display: none;">
+                            <div class="results-header">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"></path>
+                                </svg>
+                                <span>Informational Guidance</span>
+                            </div>
+                            <div id="symptom-analysis" class="symptom-analysis"></div>
+                            <div class="doctor-recommendation">
+                                <div class="recommendation-content">
+                                    <h4>Important Reminder</h4>
+                                    <p>For an accurate diagnosis, please consult a doctor. You may proceed to view our general guidance by clicking 'Get Information'</p>
+                                    <button id="connect-doctor" class="doctor-button">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                        </svg>
+                                        Connect with a Doctor
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audio Controls (shared between modes) -->
+                <div id="audio-controls" class="audio-controls hidden">
+                    <button id="play-pause-btn" class="audio-button" aria-label="Play/Pause Audio">
+                        <svg id="play-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5,3 19,12 5,21"></polygon>
+                        </svg>
+                        <svg id="pause-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                            <rect x="6" y="4" width="4" height="16"></rect>
+                            <rect x="14" y="4" width="4" height="16"></rect>
+                        </svg>
+                    </button>
+                    <button id="stop-btn" class="audio-button" aria-label="Stop Audio">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        </svg>
+                    </button>
+                    <span id="audio-status" class="audio-status-text">Audio ready</span>
+                </div>
+
+                <!-- Disclaimer -->
+                <div class="disclaimer">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <p>This AI provides general information only. Always consult a healthcare professional for medical advice.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Information Modal -->
+    <div id="info-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>About She Nurtures AI</h3>
+                <button id="close-modal" class="icon-button">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>She Nurtures AI is your compassionate guide for understanding reproductive health topics, particularly PCOS and PCOD.</p>
+                
+                <h4>Two Modes Available:</h4>
+                <ul>
+                    <li><strong>General Guide:</strong> Ask open-ended questions about reproductive health</li>
+                    <li><strong>Symptom Checker:</strong> Get structured information based on specific symptoms</li>
+                </ul>
+                
+                <h4>Features:</h4>
+                <ul>
+                    <li>Empathetic AI responses with medical safety focus</li>
+                    <li>Audio playback using Azure Text-to-Speech</li>
+                    <li>Chat bubbles for conversation history</li>
+                    <li>Structured symptom analysis</li>
+                    <li>Mobile-friendly responsive design</li>
+                </ul>
+                
+                <h4>Important:</h4>
+                <p>This AI assistant provides general educational information only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult with qualified healthcare providers for your specific health concerns.</p>
+                
+                <div class="modal-footer">
+                    <p class="version-info">Version 3.0.0 - Dual Mode Interface</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Toast -->
+    <div id="error-toast" class="toast error-toast" style="display: none;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+        <span id="error-message"></span>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="success-toast" class="toast success-toast" style="display: none;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span id="success-message"></span>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
