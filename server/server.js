@@ -119,13 +119,13 @@ class OpenRouterService {
                     "X-Title": "She Nurtures AI Assistant"
                 },
                 body: JSON.stringify({
-                    model: "mistralai/mistral-7b-instruct:free",
+                    model: "meta-llama/llama-3.1-8b-instruct:free",
                     messages: [
                         { role: "system", content: systemPrompt },
                         { role: "user", content: userInput }
                     ],
                     temperature: 0.7,
-                    max_tokens: 200,
+                    max_tokens: 500,
                     top_p: 0.9,
                     frequency_penalty: 0.1
                 })
