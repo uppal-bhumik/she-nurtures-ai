@@ -8,15 +8,39 @@ const path = require('path');
 // Initialize Express app
 const app = express();
 
-// Middleware configuration
-app.use(express.json({ limit: '10mb' }));
+// Updated CORS configuration for Render deployment
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : '*',
-    credentials: true
+    origin: [
+        'https://she-nurtures-ai.onrender.com',
+        'http://localhost:3000',
+        'http://localhost:10000'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Serve static files
-app.use(express.static(path.join(__dirname, '..', 'public')));
+// Middleware configuration
+app.use(express.json({ limit: '10mb' }));
+
+// Basic health check endpoint (for quick server verification)
+app.get('/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'ok', 
+        timestamp: new Date().toISOString(),
+        port: process.env.PORT || 3000
+    });
+});
+
+// Request logging middleware
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+    next();
+});
+
+// More reliable static file serving
+const publicPath = path.resolve(__dirname, 'public') || path.resolve(process.cwd(), 'public');
+app.use(express.static(publicPath));
 
 // Environment variables with validation
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
@@ -25,7 +49,7 @@ const AZURE_SPEECH_REGION = process.env.AZURE_SPEECH_REGION;
 
 // Validate required environment variables
 if (!OPENROUTER_API_KEY || !AZURE_SPEECH_KEY || !AZURE_SPEECH_REGION) {
-    console.error('❌ Missing required environment variables. Please check your .env file.');
+    console.error('⚠️ Missing required environment variables. Please check your .env file.');
     console.error('Required: OPENROUTER_API_KEY, AZURE_SPEECH_KEY, AZURE_SPEECH_REGION');
     process.exit(1);
 }
@@ -243,7 +267,7 @@ class AzureTTSService {
             // Limit text length for TTS
             const processedText = sanitizedText.substring(0, 1000);
             
-            logWithTimestamp('📝 Processing text', { 
+            logWithTimestamp('🔍 Processing text', { 
                 originalLength: text.length, 
                 processedLength: processedText.length,
                 preview: processedText.substring(0, 50) + '...'
@@ -395,7 +419,7 @@ app.post('/api/chat', async (req, res) => {
 
         // Sanitize input
         const sanitizedInput = userInput.trim().substring(0, 500);
-        logWithTimestamp('🔥 Processing general chat request', { 
+        logWithTimestamp('📥 Processing general chat request', { 
             inputLength: sanitizedInput.length,
             mode: mode,
             preview: sanitizedInput.substring(0, 100) + (sanitizedInput.length > 100 ? '...' : '')
@@ -778,7 +802,7 @@ app.use((err, req, res, next) => {
 
 // Routes
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // 404 handler for API routes
@@ -801,8 +825,8 @@ app.use('/api', (req, res, next) => {
     }
     next();
 });
-// Start server
 
+// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
     logWithTimestamp(`🚀 She Nurtures AI server running on port ${PORT}`);
