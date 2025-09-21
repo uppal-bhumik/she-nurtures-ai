@@ -205,9 +205,11 @@ class OpenRouterService {
             
             if (isOffTopic) {
                 logWithTimestamp('🚨 AI went completely off-topic, using emergency fallback');
-                aiText = systemPrompt === SYMPTOM_SYSTEM_PROMPT 
-                    ? "Thank you for sharing these symptoms - I understand your concerns. These symptoms often suggest hormonal imbalances commonly seen in PCOS. Please discuss these specific symptoms with a healthcare provider for proper evaluation."
-                    : "I understand your concerns about reproductive health, and these are important questions many women have. I'd encourage you to speak with a healthcare provider for personalized guidance.";
+                if (systemPrompt === SYMPTOM_SYSTEM_PROMPT) {
+                    aiText = "Thank you for sharing these symptoms - I understand your concerns. These symptoms often suggest hormonal imbalances commonly seen in PCOS. Please discuss these specific symptoms with a healthcare provider for proper evaluation.";
+                } else {
+                    aiText = "I understand your concerns about reproductive health, and these are important questions many women have. I'd encourage you to speak with a healthcare provider for personalized guidance.";
+                }
             }
             
             // Length validation - enforce brevity
@@ -221,9 +223,12 @@ class OpenRouterService {
                 
                 // Ensure it ends properly
                 if (!aiText.includes('healthcare provider')) {
-                    const baseResponse = systemPrompt === SYMPTOM_SYSTEM_PROMPT 
-                        ? "Please discuss these symptoms with a healthcare provider for proper evaluation."
-                        : "I'd encourage you to speak with a healthcare provider for personalized guidance.";
+                    let baseResponse;
+                    if (systemPrompt === SYMPTOM_SYSTEM_PROMPT) {
+                        baseResponse = "Please discuss these symptoms with a healthcare provider for proper evaluation.";
+                    } else {
+                        baseResponse = "I'd encourage you to speak with a healthcare provider for personalized guidance.";
+                    }
                     
                     // Find last complete sentence and add proper ending
                     const lastPeriod = aiText.lastIndexOf('.');
@@ -240,32 +245,12 @@ class OpenRouterService {
             const maxSentences = systemPrompt === SYMPTOM_SYSTEM_PROMPT ? 3 : 2;
             
             if (sentenceCount > maxSentences) {
-                logWithTimestamp(`⚠️ Too many sentences (${sentenceCount}), using fallback`);
-                aiText = systemPrompt === SYMPTOM_SYSTEM_PROMPT 
-                    ? "Thank you for sharing these symptoms - I understand your concerns. These symptoms often suggest hormonal imbalances commonly seen in PCOS. Please discuss these specific symptoms with a healthcare provider for proper evaluation."
-                    : "I understand your concerns about reproductive health, and these are important questions many women have. I'd encourage you to speak with a healthcare provider for personalized guidance.";
-            }
-            const offTopicIndicators = [
-                'creative and informative',
-                'great challenge',
-                'more specific instructions',
-                'what topic should',
-                'what style should',
-                'tailor my response',
-                'work together',
-                'I can help you',
-                'let me know what you need'
-            ];
-            
-            const isOffTopic = offTopicIndicators.some(indicator => 
-                aiText.toLowerCase().includes(indicator.toLowerCase())
-            );
-            
-            if (isOffTopic) {
-                logWithTimestamp('🚨 AI went completely off-topic, using emergency fallback');
-                aiText = systemPrompt === SYMPTOM_SYSTEM_PROMPT 
-                    ? `Thank you for sharing these symptoms with me - I understand how important it is to get clarity about what your body might be experiencing. The symptoms you've described often suggest hormonal patterns that many women face, particularly those related to reproductive health conditions where multiple symptoms can appear together as your body responds to changing hormone levels. You're definitely not alone in having these concerns, and seeking understanding about these patterns is actually a really positive step in taking charge of your health. I encourage you to discuss these specific symptoms with a healthcare provider who can properly evaluate your individual situation and provide personalized guidance.`
-                    : `I understand you're seeking information about reproductive health, and that's completely natural when you have concerns about your body. Many women have questions about hormonal balance, menstrual health, PCOS, and other reproductive wellness topics, and having access to educational information can help you feel more empowered. I'd encourage you to discuss your specific concerns with a healthcare provider who can give you personalized guidance based on your individual health needs.`;
+                logWithTimestamp(`Too many sentences (${sentenceCount}), using fallback`);
+                if (systemPrompt === SYMPTOM_SYSTEM_PROMPT) {
+                    aiText = "Thank you for sharing these symptoms - I understand your concerns. These symptoms often suggest hormonal imbalances commonly seen in PCOS. Please discuss these specific symptoms with a healthcare provider for proper evaluation.";
+                } else {
+                    aiText = "I understand your concerns about reproductive health, and these are important questions many women have. I'd encourage you to speak with a healthcare provider for personalized guidance.";
+                }
             }
             
             // Check for formatting issues and clean up
@@ -997,6 +982,7 @@ app.listen(PORT, async () => {
         azureRegion: AZURE_SPEECH_REGION || '❌ Missing'
     });
     
+    
     // Test Azure connection on startup
     try {
         const azureTest = await AzureTTSService.testConnection();
@@ -1009,6 +995,6 @@ app.listen(PORT, async () => {
     } catch (error) {
         logWithTimestamp('⚠️ Azure TTS startup test failed', { error: error.message });
     }
-    
+      
     logWithTimestamp('🌸 She Nurtures AI is ready with enhanced prompts!');
 });
