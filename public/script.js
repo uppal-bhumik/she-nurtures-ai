@@ -688,7 +688,10 @@ class UIController {
 // API Service Class
 class APIService {
     constructor() {
-        this.baseURL = 'http://localhost:3000';
+        // More explicit version
+    this.baseURL = window.location.hostname === 'localhost' ? 
+    'http://localhost:3000' : 
+    window.location.origin;
         this.timeout = 120000; // 2 minutes timeout
     }
 
