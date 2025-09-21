@@ -186,7 +186,7 @@ class OpenRouterService {
                 fullText: aiText 
             });
             
-            // Enhanced quality validation - Check for off-topic responses
+            // Comprehensive response validation and cleanup
             const offTopicIndicators = [
                 'creative and informative',
                 'great challenge',
@@ -268,7 +268,7 @@ class OpenRouterService {
                     : `I understand you're seeking information about reproductive health, and that's completely natural when you have concerns about your body. Many women have questions about hormonal balance, menstrual health, PCOS, and other reproductive wellness topics, and having access to educational information can help you feel more empowered. I'd encourage you to discuss your specific concerns with a healthcare provider who can give you personalized guidance based on your individual health needs.`;
             }
             
-            // Enhanced quality validation - Check for formatting issues
+            // Check for formatting issues and clean up
             if (aiText.includes('**') || aiText.includes('*') || aiText.includes('- ') || aiText.includes('1.') || aiText.includes('•')) {
                 logWithTimestamp('⚠️ AI used forbidden formatting, cleaning response');
                 aiText = aiText
