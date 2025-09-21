@@ -138,7 +138,7 @@ class OpenRouterService {
                     "X-Title": "She Nurtures AI Assistant"
                 },
                 body: JSON.stringify({
-                    model: "mistralai/mistral-7b-instruct:free",
+                    model: "google/gemma-2-9b-it:free",
                     messages: [
                         { role: "system", content: systemPrompt },
                         { role: "user", content: userInput }
