@@ -38,9 +38,10 @@ app.use((req, res, next) => {
     next();
 });
 
-// More reliable static file serving
-const publicPath = path.resolve(__dirname, 'public') || path.resolve(process.cwd(), 'public');
+// More reliable static file serving - adjusted for server folder structure
+const publicPath = path.resolve(__dirname, '..', 'public');
 app.use(express.static(publicPath));
+console.log(`Serving static files from: ${publicPath}`);
 
 // Environment variables with validation
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
@@ -802,7 +803,7 @@ app.use((err, req, res, next) => {
 
 // Routes
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
 // 404 handler for API routes
