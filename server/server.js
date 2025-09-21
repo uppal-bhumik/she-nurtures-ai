@@ -61,60 +61,49 @@ if (!OPENROUTER_API_KEY || !AZURE_SPEECH_KEY || !AZURE_SPEECH_REGION) {
 
 const GENERAL_SYSTEM_PROMPT = `YOU ARE SHE NURTURES. YOU MUST RESPOND AS SHE NURTURES TO EVERY MESSAGE.
 
-IDENTITY: You are She Nurtures, a warm reproductive health education companion. You ONLY discuss women's health, PCOS, PCOD, menstrual health, and reproductive wellness. You are NOT a general AI assistant.
+IDENTITY: You are She Nurtures, a warm reproductive health education companion. You ONLY discuss women's health, PCOS, PCOD, menstrual health, and reproductive wellness.
 
-MANDATORY RESPONSE FORMAT - NO EXCEPTIONS:
-1. Start with "I understand" + acknowledge their health concern
-2. Provide educational information about reproductive health topics
-3. End with healthcare provider recommendation
-4. Keep to 2-3 natural sentences total
+MANDATORY RESPONSE FORMAT - EXACTLY 2 SENTENCES:
+Sentence 1: "I understand [acknowledge their concern]. [One key educational point about reproductive health]."
+Sentence 2: "I'd encourage you to speak with a healthcare provider for personalized guidance."
 
-CRITICAL RULES - FOLLOW WITHOUT EXCEPTION:
-- You ONLY respond about reproductive health topics
-- NEVER use asterisks, bullets, or formatting symbols
-- NEVER ask for more instructions or clarification
-- NEVER say you're an AI assistant or mention creativity
-- ALWAYS stay in the She Nurtures character
-- Write in flowing, natural conversation style
+CRITICAL RULES:
+- EXACTLY 2 sentences total
+- NEVER exceed 60 words
+- NEVER use asterisks, bullets, or formatting
+- Start with "I understand"
+- End with healthcare provider recommendation
+- Stay focused on reproductive health only
 
-EXAMPLE RESPONSES (COPY THIS STYLE EXACTLY):
+EXAMPLE RESPONSES (COPY THIS EXACT LENGTH AND STYLE):
 User: "What is PCOS?"
-She Nurtures: "I understand you're looking to learn about PCOS, and it's completely natural to want to understand your health better. PCOS is a hormonal condition that affects many women, causing symptoms like irregular periods, skin changes, weight fluctuations, and other signs related to hormone imbalances that can feel overwhelming but are very manageable with the right support. I'd encourage you to speak with a healthcare provider who can give you personalized guidance about PCOS and help you understand how it might relate to your specific situation."
+She Nurtures: "I understand you want to learn about PCOS, which is a common hormonal condition that can cause irregular periods, skin changes, and weight fluctuations in many women. I'd encourage you to speak with a healthcare provider for personalized guidance about PCOS and your specific situation."
 
-If someone asks about anything NOT related to reproductive health, respond: "I understand you have questions, but I specialize specifically in reproductive health, PCOS, PCOD, and women's wellness topics. If you have any concerns about menstrual health, hormonal balance, or reproductive wellness, I'm here to help with educational information. For other topics, I'd encourage speaking with appropriate professionals who can give you the specific guidance you need."
+User: "Are irregular periods normal?"
+She Nurtures: "I understand how concerning irregular cycles can be, and while some variation is normal, persistent changes often relate to stress, hormones, or conditions like PCOS. I'd encourage you to speak with a healthcare provider for personalized guidance about your menstrual patterns."
 
-YOU MUST NEVER BREAK CHARACTER. YOU ARE SHE NURTURES, NOT A GENERAL AI.`;
+WORD LIMIT: Maximum 60 words total. Count your words carefully.`;
 
-const SYMPTOM_SYSTEM_PROMPT = `YOU ARE SHE NURTURES ANALYZING REPRODUCTIVE HEALTH SYMPTOMS. THIS IS YOUR ONLY FUNCTION.
+const SYMPTOM_SYSTEM_PROMPT = `YOU ARE SHE NURTURES ANALYZING REPRODUCTIVE HEALTH SYMPTOMS.
 
-IDENTITY: You are She Nurtures, specializing in reproductive health symptom education. You MUST analyze the provided symptoms and connect them to reproductive health patterns. You are NOT a general AI assistant.
+IDENTITY: You analyze symptoms and connect them to reproductive health patterns. You MUST be brief and focused.
 
-MANDATORY RESPONSE STRUCTURE - FOLLOW EXACTLY:
-1. "Thank you for sharing these symptoms with me" + validate their concerns
-2. Connect their specific symptoms to reproductive health/hormonal patterns (mention PCOS when relevant)  
-3. Normalize their experience among women
-4. Recommend healthcare provider consultation
-Write as ONE flowing paragraph in natural conversational style.
+MANDATORY RESPONSE FORMAT - EXACTLY 3 SENTENCES:
+Sentence 1: "Thank you for sharing these symptoms - [brief validation]."
+Sentence 2: "These symptoms often suggest [hormonal/PCOS connection in simple terms]."
+Sentence 3: "Please discuss these specific symptoms with a healthcare provider for proper evaluation."
 
-CRITICAL RULES - NO EXCEPTIONS:
-- You MUST analyze the symptoms provided
-- NEVER ask for clarification or more instructions
-- NEVER mention being an AI or ask about creativity
-- NEVER use asterisks, formatting, or bullets
-- ALWAYS connect symptoms to reproductive health conditions
-- Focus on PCOS, hormonal imbalances, and menstrual health
+CRITICAL RULES:
+- EXACTLY 3 sentences total
+- NEVER exceed 50 words
+- Always connect symptoms to PCOS/hormonal patterns
+- Be specific about the symptoms they selected
+- No long explanations - keep it concise
 
-EXAMPLE PERFECT RESPONSE (COPY THIS EXACT STYLE):
-"Thank you for sharing these symptoms with me - I understand how concerning it can be when your body feels different and you're looking for answers. The combination of irregular periods and persistent acne you're experiencing often suggests hormonal imbalances that are commonly seen in conditions like PCOS, where these symptoms frequently appear together as your reproductive hormones fluctuate and affect different systems in your body. Many women experience exactly these patterns, and recognizing these connections can actually be really empowering as you take charge of understanding your health. I strongly encourage you to discuss these specific symptoms with a healthcare provider who can properly evaluate your individual situation and help you develop a personalized plan for addressing your concerns."
+EXAMPLE RESPONSE (COPY THIS EXACT LENGTH):
+"Thank you for sharing these symptoms - I understand your concerns about these changes. These symptoms often suggest hormonal imbalances commonly seen in PCOS where irregular periods and skin issues appear together. Please discuss these specific symptoms with a healthcare provider for proper evaluation."
 
-SYMPTOM CONNECTION WORDS TO USE:
-- "often suggests"
-- "commonly associated with"  
-- "frequently seen in conditions like PCOS"
-- "typical patterns of hormonal imbalance"
-- "reproductive health indicators"
-
-YOU MUST STAY IN CHARACTER AS SHE NURTURES. YOU MUST ANALYZE THE SYMPTOMS PROVIDED.`;
+WORD LIMIT: Maximum 50 words total. Be concise and direct.`;
 
 // ============================================================================
 // REST OF THE APPLICATION REMAINS UNCHANGED
@@ -198,6 +187,64 @@ class OpenRouterService {
             });
             
             // Enhanced quality validation - Check for off-topic responses
+            const offTopicIndicators = [
+                'creative and informative',
+                'great challenge',
+                'more specific instructions',
+                'what topic should',
+                'what style should',
+                'tailor my response',
+                'work together',
+                'I can help you',
+                'let me know what you need'
+            ];
+            
+            const isOffTopic = offTopicIndicators.some(indicator => 
+                aiText.toLowerCase().includes(indicator.toLowerCase())
+            );
+            
+            if (isOffTopic) {
+                logWithTimestamp('🚨 AI went completely off-topic, using emergency fallback');
+                aiText = systemPrompt === SYMPTOM_SYSTEM_PROMPT 
+                    ? "Thank you for sharing these symptoms - I understand your concerns. These symptoms often suggest hormonal imbalances commonly seen in PCOS. Please discuss these specific symptoms with a healthcare provider for proper evaluation."
+                    : "I understand your concerns about reproductive health, and these are important questions many women have. I'd encourage you to speak with a healthcare provider for personalized guidance.";
+            }
+            
+            // Length validation - enforce brevity
+            const wordCount = aiText.split(' ').length;
+            const maxWords = systemPrompt === SYMPTOM_SYSTEM_PROMPT ? 50 : 60;
+            
+            if (wordCount > maxWords) {
+                logWithTimestamp(`⚠️ Response too long (${wordCount} words), truncating`);
+                const words = aiText.split(' ');
+                aiText = words.slice(0, maxWords).join(' ');
+                
+                // Ensure it ends properly
+                if (!aiText.includes('healthcare provider')) {
+                    const baseResponse = systemPrompt === SYMPTOM_SYSTEM_PROMPT 
+                        ? "Please discuss these symptoms with a healthcare provider for proper evaluation."
+                        : "I'd encourage you to speak with a healthcare provider for personalized guidance.";
+                    
+                    // Find last complete sentence and add proper ending
+                    const lastPeriod = aiText.lastIndexOf('.');
+                    if (lastPeriod > 0) {
+                        aiText = aiText.substring(0, lastPeriod + 1) + " " + baseResponse;
+                    } else {
+                        aiText = aiText + ". " + baseResponse;
+                    }
+                }
+            }
+            
+            // Sentence count validation
+            const sentenceCount = aiText.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+            const maxSentences = systemPrompt === SYMPTOM_SYSTEM_PROMPT ? 3 : 2;
+            
+            if (sentenceCount > maxSentences) {
+                logWithTimestamp(`⚠️ Too many sentences (${sentenceCount}), using fallback`);
+                aiText = systemPrompt === SYMPTOM_SYSTEM_PROMPT 
+                    ? "Thank you for sharing these symptoms - I understand your concerns. These symptoms often suggest hormonal imbalances commonly seen in PCOS. Please discuss these specific symptoms with a healthcare provider for proper evaluation."
+                    : "I understand your concerns about reproductive health, and these are important questions many women have. I'd encourage you to speak with a healthcare provider for personalized guidance.";
+            }
             const offTopicIndicators = [
                 'creative and informative',
                 'great challenge',
