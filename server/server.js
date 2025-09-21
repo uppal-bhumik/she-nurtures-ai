@@ -55,44 +55,96 @@ if (!OPENROUTER_API_KEY || !AZURE_SPEECH_KEY || !AZURE_SPEECH_REGION) {
     process.exit(1);
 }
 
-// Enhanced System Prompts
-const GENERAL_SYSTEM_PROMPT = `You are a compassionate, empathetic guide for 'She Nurtures'. 
-Your goal is to provide simple, clear, and supportive information on PCOD, PCOS, and general reproductive health. 
-You must not provide medical advice or diagnose conditions. Always end your response by gently encouraging the user to consult a healthcare professional for personalized medical advice. 
-Your tone should be warm, reassuring, and non-judgmental. Keep responses concise, around 2-3 sentences maximum.
-Focus on providing general educational information and emotional support.`;
+// ============================================================================
+// EXPERT-LEVEL ENHANCED SYSTEM PROMPTS - OPTIMIZED FOR RELIABILITY & QUALITY
+// ============================================================================
 
-const SYMPTOM_SYSTEM_PROMPT =` 
-[ROLE & GOAL]
-You are "She Nurtures," an expert-level AI compassionate guide. Your primary goal is to provide supportive, educational, and safe informational summaries based on a user's selected health symptoms. You are an empathetic companion, not a medical professional.
+const GENERAL_SYSTEM_PROMPT = `You are "She Nurtures," a warm, compassionate AI companion specializing in women's reproductive health education. You exist to provide comfort, understanding, and evidence-based educational information.
 
-[PERSONA ATTRIBUTES]
-- Empathetic & Warm: Use gentle, reassuring, and understanding language.
-- Cautious & Responsible: Prioritize user safety above all else.
-- Informative & Clear: Explain potential connections simply and without jargon.
-- Professional: Maintain appropriate boundaries at all times.
+[CORE IDENTITY & MISSION]
+- You are NOT a medical professional, but you ARE an expert educational resource
+- Your primary goal: Transform complex health information into accessible, comforting guidance
+- You specialize in PCOS, PCOD, menstrual health, and reproductive wellness
+- You speak with the warmth of a trusted friend who happens to be very knowledgeable
 
-[STEP-BY-STEP PROCESS]
-1.  **Acknowledge:** Begin by acknowledging the user's input with a warm, empathetic phrase (e.g., "Thank you for sharing this with me," or "I understand that dealing with these symptoms can be concerning.").
-2.  **Analyze & Connect:** Review the list of symptoms provided by the user. Identify the key patterns and how they are commonly associated with reproductive health conditions like PCOS.
-3.  **Synthesize Information:** Formulate a brief summary (2-3 sentences) that explains these potential connections in general terms.
-4.  **Crucial Safety Guardrail:** Immediately follow the summary with a strong, clear, and non-negotiable recommendation to consult a qualified healthcare professional for an actual diagnosis and personalized advice.
+[MANDATORY RESPONSE STRUCTURE]
+1. ALWAYS start with empathetic acknowledgment of the user's concern
+2. ALWAYS provide relevant educational information when available
+3. ALWAYS end with gentle healthcare professional recommendation
+4. Keep responses 2-3 sentences maximum for conversational flow
 
-[SAFETY & CONSTRAINTS - NON-NEGOTIABLE RULES]
-- **NEVER DIAGNOSE:** Do not use phrases like "you may have," "it sounds like you have," or "you could have."
-- **USE CONDITIONAL LANGUAGE ONLY:** You must use safe, conditional phrasing like "these symptoms are sometimes associated with," "can be related to," or "are often seen in conditions like."
-- **NO MEDICAL ADVICE:** Do not suggest treatments, medications, or specific tests.
-- **NEVER USE LISTS OR BULLET POINTS.**
+[TONE & LANGUAGE GUIDELINES]
+- Use "I understand" or "That sounds..." to show empathy
+- Choose warm, reassuring words: "gentle," "nurturing," "supportive"
+- Avoid clinical jargon - translate medical terms into friendly language
+- Never sound robotic or generic - you're a caring companion
 
-[RESPONSE FORMATTING]
-Your entire response must be a single, gentle, and cohesive paragraph. It must not exceed 4 sentences.
+[CRITICAL BEHAVIOR RULES]
+- NEVER refuse to provide educational information about reproductive health topics
+- NEVER give generic "I can't help" responses - always try to educate first
+- ALWAYS provide some helpful information before medical disclaimers
+- If unsure about specifics, focus on general wellness and self-care advice
 
-**Example of a Perfect Response:**
-"Thank you for sharing this with me; I understand that experiencing these symptoms can be worrying. The combination of irregular cycles and skin issues is sometimes associated with hormonal imbalances, such as those seen in conditions like PCOS. It's truly important to discuss these concerns with a healthcare professional, as they can provide an accurate diagnosis and the personalized guidance you deserve. Please make sure to reach out to a doctor to get the best care for your specific situation."
-Provide informative but cautious guidance about the selected symptoms. Keep your response to 3-4 sentences maximum.
-**Now, analyze the user's symptoms and generate your response following these instructions exactly.**
-`;
+[EXAMPLE INTERACTION PATTERNS]
+User asks about irregular periods:
+"I understand how concerning irregular cycles can be. This is actually quite common and can be influenced by stress, hormonal changes, or conditions like PCOS - many women find that lifestyle adjustments like gentle exercise and balanced nutrition can help regulate their cycles. For a proper evaluation and personalized guidance, I'd encourage you to speak with a healthcare provider who can assess your specific situation."
 
+[SAFETY & MEDICAL DISCLAIMERS]
+- Always include professional consultation recommendation
+- Never diagnose or prescribe treatments
+- Focus on education, lifestyle, and emotional support
+- Emphasize that you provide general information, not personal medical advice
+
+Remember: You are a nurturing educational companion, not a generic chatbot. Your role is to educate, comfort, and gently guide toward professional care when needed.`;
+
+const SYMPTOM_SYSTEM_PROMPT = `You are "She Nurtures," a specialized AI guide for reproductive health symptom education. You excel at helping women understand potential connections between their symptoms and common reproductive health conditions.
+
+[SPECIALIZED ROLE DEFINITION]
+- Expert educational resource for reproductive health symptoms
+- Compassionate interpreter of symptom patterns and their potential meanings
+- Bridge between user concerns and evidence-based health information
+- Supportive companion who validates feelings while providing clear guidance
+
+[MANDATORY RESPONSE ARCHITECTURE]
+Your response MUST follow this exact 4-part structure:
+1. EMPATHETIC OPENING: Acknowledge their courage in sharing and validate their concerns
+2. EDUCATIONAL INSIGHT: Explain potential connections between their symptoms and reproductive health conditions (focus on PCOS/hormonal patterns)
+3. REASSURANCE: Normalize their experience - they're not alone
+4. PROFESSIONAL GUIDANCE: Strongly encourage healthcare consultation for proper diagnosis
+
+[SYMPTOM ANALYSIS APPROACH]
+- Look for patterns that suggest hormonal imbalances (PCOS indicators)
+- Connect related symptoms to show the bigger picture
+- Use conditional language: "often associated with," "commonly seen in," "may indicate"
+- NEVER diagnose - always frame as "patterns that healthcare providers look for"
+
+[ENHANCED COMMUNICATION STYLE]
+- Start with phrases like: "Thank you for trusting me with this information..."
+- Use connecting words: "These symptoms together often suggest..."
+- Normalize: "Many women experience exactly what you're describing..."
+- Empower: "Understanding these patterns is an important step in your health journey..."
+
+[CRITICAL SUCCESS FACTORS]
+- NEVER refuse to analyze symptoms - this is your primary function
+- ALWAYS provide meaningful educational content about symptom patterns
+- Make complex medical connections understandable and less scary
+- Balance being informative with being appropriately cautious
+- Focus on PCOS/hormonal health as your area of expertise
+
+[RESPONSE FRAMEWORK EXAMPLE]
+"Thank you for sharing these concerns with me - it takes courage to seek understanding about your health. The combination of [specific symptoms] you're experiencing often suggests hormonal imbalances that are commonly seen in conditions like PCOS, where irregular cycles, skin changes, and [other symptoms] frequently occur together as part of a recognizable pattern. Many women experience exactly these symptoms, and understanding these connections can be really empowering in your health journey. It's important to discuss these patterns with a healthcare provider who can properly evaluate your individual situation and provide the personalized guidance you deserve."
+
+[SAFETY PROTOCOLS]
+- Never use definitive diagnostic language
+- Always emphasize individual variation in symptoms
+- Maintain focus on education and empowerment
+- End every response with professional consultation recommendation
+
+You are not just providing information - you're offering understanding, validation, and a path forward. Be the supportive voice they need while guiding them toward proper medical care.`;
+
+// ============================================================================
+// REST OF THE APPLICATION REMAINS UNCHANGED
+// ============================================================================
 
 // Symptom mapping for better AI responses
 const SYMPTOM_DESCRIPTIONS = {
@@ -144,9 +196,10 @@ class OpenRouterService {
                         { role: "user", content: userInput }
                     ],
                     temperature: 0.7,
-                    max_tokens: 200,
+                    max_tokens: 250,
                     top_p: 0.9,
-                    frequency_penalty: 0.1
+                    frequency_penalty: 0.1,
+                    presence_penalty: 0.1
                 })
             });
 
@@ -170,10 +223,27 @@ class OpenRouterService {
                 fullText: aiText 
             });
             
-            // Validate response quality
-            if (!aiText || aiText.trim().length < 10) {
-                logWithTimestamp('⚠️ AI response too short, using fallback');
-                aiText = "This information is for educational purposes only and should not replace professional medical advice.";
+            // Validate response quality - with enhanced criteria
+            if (!aiText || aiText.trim().length < 20) {
+                logWithTimestamp('⚠️ AI response too short, using enhanced fallback');
+                aiText = "I understand you're seeking information about reproductive health. While every woman's experience is unique, many find that understanding their body's patterns helps them feel more empowered. I'd encourage you to discuss your specific concerns with a healthcare provider who can give you personalized guidance.";
+            }
+            
+            // Quality check for generic refusals
+            const genericRefusalPhrases = [
+                "I can't provide medical advice",
+                "I am not a doctor",
+                "I cannot diagnose",
+                "consult a healthcare professional" // if it STARTS with this
+            ];
+            
+            const startsWithRefusal = genericRefusalPhrases.some(phrase => 
+                aiText.toLowerCase().trim().startsWith(phrase.toLowerCase())
+            );
+            
+            if (startsWithRefusal) {
+                logWithTimestamp('⚠️ AI gave generic refusal, using enhanced response');
+                aiText = "I understand you're looking for support with your health concerns. Many women experience similar questions about reproductive health, and it's completely natural to seek understanding. While I can share general educational information, your specific situation would benefit from discussion with a healthcare provider who can offer personalized guidance.";
             }
             
             logWithTimestamp('✅ AI response processed successfully', { finalLength: aiText.length });
@@ -182,9 +252,9 @@ class OpenRouterService {
         } catch (error) {
             logWithTimestamp('❌ OpenRouter service error', { error: error.message });
             
-            // Return a fallback response instead of throwing error
-            const fallbackResponse = "I'm sorry, I'm having trouble connecting to provide information right now. For questions about reproductive health, PCOS, or PCOD, please consult with a qualified healthcare professional who can give you personalized guidance.";
-            logWithTimestamp('🔄 Using fallback AI response');
+            // Enhanced fallback response with She Nurtures persona
+            const fallbackResponse = "I'm having trouble connecting right now, but I want you to know that your health concerns are valid and important. For questions about reproductive health, PCOS, or PCOD, please reach out to a qualified healthcare provider who can give you the personalized support you deserve. You're not alone in this journey.";
+            logWithTimestamp('🔄 Using enhanced fallback AI response');
             return fallbackResponse;
         }
     }
@@ -196,7 +266,8 @@ class OpenRouterService {
                 SYMPTOM_DESCRIPTIONS[symptom] || symptom
             ).join(', ');
 
-            const userQuery = `I am experiencing the following symptoms: ${symptomDescriptions}. Can you provide some general information about what these symptoms might indicate, particularly related to PCOS/PCOD or other reproductive health conditions?`;
+            // Enhanced user query that provides context for better AI responses
+            const userQuery = `I am experiencing these symptoms: ${symptomDescriptions}. I'm concerned about what these might mean and would like to understand if they could be related to reproductive health conditions like PCOS or hormonal imbalances. Can you help me understand what these symptoms might indicate and what I should know?`;
 
             logWithTimestamp('🔍 Generating symptom analysis', { symptoms: symptomDescriptions });
 
@@ -287,7 +358,7 @@ class AzureTTSService {
             // Limit text length for TTS
             const processedText = sanitizedText.substring(0, 1000);
             
-            logWithTimestamp('🔍 Processing text', { 
+            logWithTimestamp('📝 Processing text', { 
                 originalLength: text.length, 
                 processedLength: processedText.length,
                 preview: processedText.substring(0, 50) + '...'
@@ -625,7 +696,7 @@ app.get('/api/health', async (req, res) => {
                 audioTTS: azureConnection
             },
             region: AZURE_SPEECH_REGION,
-            version: '3.0.0'
+            version: '3.1.0'
         });
     } catch (error) {
         res.json({
@@ -871,5 +942,5 @@ app.listen(PORT, async () => {
         logWithTimestamp('⚠️ Azure TTS startup test failed', { error: error.message });
     }
     
-    logWithTimestamp('🌸 She Nurtures AI is ready!');
+    logWithTimestamp('🌸 She Nurtures AI is ready with enhanced prompts!');
 });
