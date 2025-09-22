@@ -1,4 +1,4 @@
-// Enhanced server.js - Dual Mode with Symptom Checker and Azure TTS
+// Enhanced server.js - Dual Mode with Optimized Prompts for Perfect Responses
 require('dotenv').config();
 const express = require('express');
 const fetch = require('node-fetch');
@@ -50,78 +50,68 @@ const AZURE_SPEECH_REGION = process.env.AZURE_SPEECH_REGION;
 
 // Validate required environment variables
 if (!OPENROUTER_API_KEY || !AZURE_SPEECH_KEY || !AZURE_SPEECH_REGION) {
-    console.error('⚠️ Missing required environment variables. Please check your .env file.');
+    console.error('Missing required environment variables. Please check your .env file.');
     console.error('Required: OPENROUTER_API_KEY, AZURE_SPEECH_KEY, AZURE_SPEECH_REGION');
     process.exit(1);
 }
 
 // ============================================================================
-// BULLETPROOF SYSTEM PROMPTS - MAXIMUM RELIABILITY & CONSISTENCY
+// OPTIMIZED SYSTEM PROMPTS - PERFECT LENGTH & MEANINGFUL RESPONSES
 // ============================================================================
 
-const GENERAL_SYSTEM_PROMPT = `YOU ARE SHE NURTURES. YOU MUST RESPOND AS SHE NURTURES TO EVERY MESSAGE.
+const GENERAL_SYSTEM_PROMPT = `You are She Nurtures, a compassionate reproductive health companion.
 
-IDENTITY: You are She Nurtures, a warm reproductive health education companion. You ONLY discuss women's health, PCOS, PCOD, menstrual health, and reproductive wellness. You are NOT a general AI assistant.
+IDENTITY: Specialize in women's reproductive health, PCOS, menstrual wellness, and hormonal balance education.
 
-MANDATORY RESPONSE FORMAT - NO EXCEPTIONS:
-1. Start with "I understand" + acknowledge their health concern
-2. Provide educational information about reproductive health topics
-3. End with healthcare provider recommendation
-4. Keep to 2-3 natural sentences total
+RESPONSE REQUIREMENTS:
+- Write EXACTLY 3 sentences (60-90 words total)
+- Start with "I understand" for empathy
+- Include ONE key educational point
+- End with healthcare guidance
+- Warm, conversational tone
+- NO formatting symbols (*/-/•)
+- Focus ONLY on reproductive health
 
-CRITICAL RULES - FOLLOW WITHOUT EXCEPTION:
-- You ONLY respond about reproductive health topics
-- NEVER use asterisks, bullets, or formatting symbols
-- NEVER ask for more instructions or clarification
-- NEVER say you're an AI assistant or mention creativity
-- ALWAYS stay in the She Nurtures character
-- Write in flowing, natural conversation style
-- Do not exceed word limit of 100 words.
+PERFECT STRUCTURE:
+1. Empathetic acknowledgment: "I understand [their concern]..."
+2. Educational insight: One meaningful fact or explanation
+3. Healthcare recommendation: Brief, encouraging next step
 
-EXAMPLE RESPONSES (COPY THIS STYLE EXACTLY):
+EXAMPLES:
 User: "What is PCOS?"
-She Nurtures: "I understand you're looking to learn about PCOS, and it's completely natural to want to understand your health better. PCOS is a hormonal condition that affects many women, causing symptoms like irregular periods, skin changes, weight fluctuations, and other signs related to hormone imbalances that can feel overwhelming but are very manageable with the right support. I'd encourage you to speak with a healthcare provider who can give you personalized guidance about PCOS and help you understand how it might relate to your specific situation."
+Response: "I understand you want to learn about PCOS, which affects many women today. PCOS is a hormonal condition causing irregular periods, weight changes, and other symptoms due to elevated androgen levels disrupting normal ovulation patterns. I'd encourage discussing any concerns with a healthcare provider who can assess your specific situation."
 
-If someone asks about anything NOT related to reproductive health, respond: "I understand you have questions, but I specialize specifically in reproductive health, PCOS, PCOD, and women's wellness topics. If you have any concerns about menstrual health, hormonal balance, or reproductive wellness, I'm here to help with educational information. For other topics, I'd encourage speaking with appropriate professionals who can give you the specific guidance you need."
+User: "Why are my periods irregular?"
+Response: "I understand how concerning irregular periods can be when you're trying to understand your body's patterns. Irregular cycles often result from hormonal fluctuations, stress, weight changes, or conditions like PCOS, though some variation is completely normal. Speaking with a healthcare provider about your cycle patterns can help identify the cause and appropriate next steps."`;
 
-YOU MUST NEVER BREAK CHARACTER. YOU ARE SHE NURTURES, NOT A GENERAL AI.`;
+const SYMPTOM_SYSTEM_PROMPT = `You are She Nurtures, specialized in reproductive health symptom analysis.
 
-const SYMPTOM_SYSTEM_PROMPT = `YOU ARE SHE NURTURES ANALYZING REPRODUCTIVE HEALTH SYMPTOMS. THIS IS YOUR ONLY FUNCTION.
+IDENTITY: Analyze reproductive health symptoms and connect patterns to conditions like PCOS and hormonal imbalances.
 
-IDENTITY: You are She Nurtures, specializing in reproductive health symptom education. You MUST analyze the provided symptoms and connect them to reproductive health patterns. You are NOT a general AI assistant.
+RESPONSE REQUIREMENTS:
+- Write EXACTLY 4 sentences (70-100 words total)
+- Start with "Thank you for sharing these symptoms"
+- Connect symptoms to reproductive health patterns
+- Mention PCOS when relevant to their symptoms
+- End with strong healthcare recommendation
 
-MANDATORY RESPONSE STRUCTURE - FOLLOW EXACTLY:
-1. "Thank you for sharing these symptoms with me" + validate their concerns
-2. Connect their specific symptoms to reproductive health/hormonal patterns (mention PCOS when relevant)  
-3. Normalize their experience among women
-4. Recommend healthcare provider consultation
-Write as ONE flowing paragraph in natural conversational style of just 100 words, you can't exceed the limit.
+PERFECT STRUCTURE:
+1. Gratitude + validation: "Thank you for sharing these symptoms..."
+2. Pattern connection: Link symptoms to reproductive health/hormones
+3. Normalization: "Many women experience..."
+4. Healthcare guidance: Clear next step recommendation
 
-CRITICAL RULES - NO EXCEPTIONS:
-- You MUST analyze the symptoms provided
-- NEVER ask for clarification or more instructions
-- NEVER mention being an AI or ask about creativity
-- NEVER use asterisks, formatting, or bullets
-- ALWAYS connect symptoms to reproductive health conditions
-- Focus on PCOS, hormonal imbalances, and menstrual health
-- NEVER exceed 100 words
-- 100 is your word limit, count your words carefully
-
-EXAMPLE PERFECT RESPONSE (COPY THIS EXACT STYLE):
-"Thank you for sharing these symptoms with me - I understand how concerning it can be when your body feels different and you're looking for answers. The combination of irregular periods and persistent acne you're experiencing often suggests hormonal imbalances that are commonly seen in conditions like PCOS, where these symptoms frequently appear together as your reproductive hormones fluctuate and affect different systems in your body. Many women experience exactly these patterns, and recognizing these connections can actually be really empowering as you take charge of understanding your health. I strongly encourage you to discuss these specific symptoms with a healthcare provider who can properly evaluate your individual situation and help you develop a personalized plan for addressing your concerns."
-
-SYMPTOM CONNECTION WORDS TO USE:
-- "often suggests"
-- "commonly associated with"  
-- "frequently seen in conditions like PCOS"
-- "typical patterns of hormonal imbalance"
-- "reproductive health indicators"
-
-YOU MUST STAY IN CHARACTER AS SHE NURTURES. YOU MUST ANALYZE THE SYMPTOMS PROVIDED.`;
+EXAMPLE:
+User symptoms: irregular periods, acne, weight gain
+Response: "Thank you for sharing these symptoms - recognizing these patterns is an important step in understanding your health. The combination of irregular periods, persistent acne, and weight changes often indicates hormonal imbalances, particularly patterns we see with PCOS where elevated androgens affect multiple body systems. Many women experience exactly these symptoms together, and you're definitely not alone in seeking answers about these changes. I strongly encourage discussing these specific symptoms with a healthcare provider for proper evaluation and personalized guidance."`;
 
 // ============================================================================
-// REST OF THE APPLICATION REMAINS UNCHANGED
+// OPTIMIZED FALLBACK RESPONSES - SHORTER & MORE FOCUSED
 // ============================================================================
+
+const PERFECT_GENERAL_FALLBACK = "I understand you have questions about reproductive health, and seeking information shows you're taking an active role in your wellbeing. Many women share similar concerns about hormonal balance, menstrual health, and PCOS-related topics. I'd encourage discussing your specific concerns with a healthcare provider who can offer personalized guidance based on your individual health needs.";
+
+const PERFECT_SYMPTOM_FALLBACK = "Thank you for sharing these symptoms with me - seeking understanding about what your body is experiencing is so important. The symptoms you've described often suggest hormonal patterns that many women face, particularly related to reproductive health conditions. You're definitely not alone in having these concerns, and recognizing these patterns is a crucial first step. I encourage discussing these specific symptoms with a healthcare provider for proper evaluation and personalized care.";
 
 // Symptom mapping for better AI responses
 const SYMPTOM_DESCRIPTIONS = {
@@ -152,11 +142,67 @@ const logWithTimestamp = (message, data = null) => {
     }
 };
 
+// ============================================================================
+// ENHANCED VALIDATION FUNCTION - STRICTER REQUIREMENTS
+// ============================================================================
+
+const validateResponse = (text, isSymptomMode = false) => {
+    // Stricter word count requirements
+    const maxWords = isSymptomMode ? 100 : 90;
+    const minWords = isSymptomMode ? 70 : 60;
+    const expectedSentences = isSymptomMode ? 4 : 3;
+    
+    // Count words and sentences
+    const wordCount = text.trim().split(/\s+/).length;
+    const sentenceCount = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+    
+    // Check for forbidden formatting (stricter)
+    const hasForbiddenFormatting = text.includes('*') || 
+                                  text.includes('-') || 
+                                  text.includes('•') || 
+                                  text.includes('1.') ||
+                                  text.includes('2.') ||
+                                  text.includes('\n-') ||
+                                  text.includes(':\n');
+    
+    // Check required patterns
+    const hasRequiredStart = isSymptomMode ? 
+        text.startsWith('Thank you for sharing') : 
+        text.startsWith('I understand');
+    
+    const hasHealthcareRecommendation = text.toLowerCase().includes('healthcare provider') ||
+                                       text.toLowerCase().includes('medical professional') ||
+                                       text.toLowerCase().includes('doctor');
+    
+    // Stricter validation
+    const isValid = !hasForbiddenFormatting && 
+                   hasRequiredStart && 
+                   hasHealthcareRecommendation &&
+                   wordCount >= minWords && 
+                   wordCount <= maxWords && 
+                   sentenceCount === expectedSentences; // Exact sentence count
+    
+    return {
+        isValid,
+        wordCount,
+        sentenceCount,
+        issues: {
+            formatting: hasForbiddenFormatting,
+            wrongStart: !hasRequiredStart,
+            noHealthcareRec: !hasHealthcareRecommendation,
+            wrongLength: wordCount < minWords || wordCount > maxWords,
+            wrongSentenceCount: sentenceCount !== expectedSentences
+        }
+    };
+};
+
 // Service classes for better organization
 class OpenRouterService {
     static async generateResponse(userInput, systemPrompt = GENERAL_SYSTEM_PROMPT) {
+        const isSymptomMode = systemPrompt === SYMPTOM_SYSTEM_PROMPT;
+        
         try {
-            logWithTimestamp('🤖 Generating AI response from OpenRouter...');
+            logWithTimestamp('Generating AI response from OpenRouter...');
             
             const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
@@ -172,11 +218,11 @@ class OpenRouterService {
                         { role: "system", content: systemPrompt },
                         { role: "user", content: userInput }
                     ],
-                    temperature: 0.3,  // Much lower for consistency
-                    max_tokens: 250,
-                    top_p: 0.8,        // More focused
-                    frequency_penalty: 0.3,  // Penalize repetition
-                    presence_penalty: 0.2    // Encourage staying on topic
+                    temperature: 0.3, // Reduced for more consistent responses
+                    max_tokens: 150,  // Reduced from 200
+                    top_p: 0.7,       // Reduced for more focused responses
+                    frequency_penalty: 0.4, // Increased to avoid repetition
+                    presence_penalty: 0.3
                 })
             });
 
@@ -191,120 +237,71 @@ class OpenRouterService {
                 throw new Error('Invalid response structure from OpenRouter');
             }
 
-            let aiText = data.choices[0].message.content;
+            let aiText = data.choices[0].message.content.trim();
             
-            // Log the raw AI response for debugging
-            logWithTimestamp('📋 Raw AI response received', { 
+            // Clean up common formatting issues
+            aiText = aiText
+                .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold formatting
+                .replace(/\*(.*?)\*/g, '$1')     // Remove italic formatting  
+                .replace(/\n\s*-\s*/g, ' ')      // Remove bullet points
+                .replace(/\n\s*\d+\.\s*/g, ' ')  // Remove numbered lists
+                .replace(/\s+/g, ' ')            // Normalize whitespace
+                .trim();
+            
+            logWithTimestamp('Raw AI response received', { 
                 textLength: aiText.length,
+                wordCount: aiText.split(/\s+/).length,
                 preview: aiText.substring(0, 100),
-                fullText: aiText 
+                isSymptomMode: isSymptomMode
             });
             
-            // Enhanced quality validation - Check for off-topic responses
-            const offTopicIndicators = [
-                'creative and informative',
-                'great challenge',
-                'more specific instructions',
-                'what topic should',
-                'what style should',
-                'tailor my response',
-                'work together',
-                'I can help you',
-                'let me know what you need'
-            ];
+            // Validate the response with stricter criteria
+            const validation = validateResponse(aiText, isSymptomMode);
             
-            const isOffTopic = offTopicIndicators.some(indicator => 
-                aiText.toLowerCase().includes(indicator.toLowerCase())
-            );
-            
-            if (isOffTopic) {
-                logWithTimestamp('🚨 AI went completely off-topic, using emergency fallback');
-                aiText = systemPrompt === SYMPTOM_SYSTEM_PROMPT 
-                    ? `Thank you for sharing these symptoms with me - I understand how important it is to get clarity about what your body might be experiencing. The symptoms you've described often suggest hormonal patterns that many women face, particularly those related to reproductive health conditions where multiple symptoms can appear together as your body responds to changing hormone levels. You're definitely not alone in having these concerns, and seeking understanding about these patterns is actually a really positive step in taking charge of your health. I encourage you to discuss these specific symptoms with a healthcare provider who can properly evaluate your individual situation and provide personalized guidance.`
-                    : `I understand you're seeking information about reproductive health, and that's completely natural when you have concerns about your body. Many women have questions about hormonal balance, menstrual health, PCOS, and other reproductive wellness topics, and having access to educational information can help you feel more empowered. I'd encourage you to discuss your specific concerns with a healthcare provider who can give you personalized guidance based on your individual health needs.`;
+            if (!validation.isValid) {
+                logWithTimestamp('AI response failed validation, using perfect fallback', {
+                    ...validation,
+                    originalResponse: aiText.substring(0, 200)
+                });
+                aiText = isSymptomMode ? PERFECT_SYMPTOM_FALLBACK : PERFECT_GENERAL_FALLBACK;
+            } else {
+                logWithTimestamp('AI response passed validation', {
+                    wordCount: validation.wordCount,
+                    sentenceCount: validation.sentenceCount
+                });
             }
             
-            // Enhanced quality validation - Check for formatting issues
-            if (aiText.includes('**') || aiText.includes('*') || aiText.includes('- ') || aiText.includes('1.') || aiText.includes('•')) {
-                logWithTimestamp('⚠️ AI used forbidden formatting, cleaning response');
-                aiText = aiText
-                    .replace(/\*\*/g, '')  // Remove bold markdown
-                    .replace(/\*/g, '')    // Remove italic markdown
-                    .replace(/- /g, '')    // Remove bullet points
-                    .replace(/\d+\./g, '') // Remove numbered lists
-                    .replace(/•/g, '')     // Remove bullet symbols
-                    .replace(/\n+/g, ' ')  // Replace line breaks with spaces
-                    .replace(/\s+/g, ' ')  // Clean up multiple spaces
-                    .trim();
-                
-                // If cleaning resulted in poor text, use fallback
-                if (aiText.length < 50) {
-                    logWithTimestamp('⚠️ Cleaned text too short, using fallback');
-                    aiText = "I understand you're seeking support with your health concerns, and that's completely natural. Many women have questions about reproductive health, and while I can share general educational information, your specific situation would benefit from a conversation with a healthcare provider. Please don't hesitate to reach out to a medical professional who can give you personalized guidance.";
-                }
-            }
-            
-            // Quality check for generic refusals
-            const genericRefusalPhrases = [
-                "I can't provide medical advice",
-                "I am not a doctor",
-                "I cannot diagnose",
-                "consult a healthcare professional" // if it STARTS with this
-            ];
-            
-            const startsWithRefusal = genericRefusalPhrases.some(phrase => 
-                aiText.toLowerCase().trim().startsWith(phrase.toLowerCase())
-            );
-            
-            if (startsWithRefusal) {
-                logWithTimestamp('⚠️ AI gave generic refusal, using enhanced response');
-                aiText = "I understand you're looking for support with your health concerns. Many women experience similar questions about reproductive health, and it's completely natural to seek understanding. While I can share general educational information, your specific situation would benefit from discussion with a healthcare provider who can offer personalized guidance.";
-            }
-            
-            logWithTimestamp('✅ AI response processed successfully', { finalLength: aiText.length });
-            
-            return aiText.trim();
+            return aiText;
         } catch (error) {
-            logWithTimestamp('❌ OpenRouter service error', { error: error.message });
-            
-            // Enhanced fallback response with She Nurtures persona
-            const fallbackResponse = "I'm having trouble connecting right now, but I want you to know that your health concerns are valid and important. For questions about reproductive health, PCOS, or PCOD, please reach out to a qualified healthcare provider who can give you the personalized support you deserve. You're not alone in this journey.";
-            logWithTimestamp('🔄 Using enhanced fallback AI response');
-            return fallbackResponse;
+            logWithTimestamp('OpenRouter service error', { error: error.message });
+            return isSymptomMode ? PERFECT_SYMPTOM_FALLBACK : PERFECT_GENERAL_FALLBACK;
         }
     }
 
     static async generateSymptomResponse(symptoms) {
         try {
-            // Convert symptom codes to readable descriptions
             const symptomDescriptions = symptoms.map(symptom => 
                 SYMPTOM_DESCRIPTIONS[symptom] || symptom
             ).join(', ');
 
-            // Enhanced user query specifically designed to get better symptom responses
-            const userQuery = `I am experiencing these specific symptoms: ${symptomDescriptions}. I'm concerned about what these might mean for my reproductive health and would really appreciate your help understanding if they could be connected to conditions like PCOS or other hormonal imbalances. I want to understand what my body might be telling me so I can be better prepared when I talk to a healthcare provider. Can you help me understand these symptom patterns?`;
+            // More focused user query for better AI responses
+            const userQuery = `I have these symptoms: ${symptomDescriptions}. Are these related to PCOS or hormonal issues?`;
 
-            logWithTimestamp('🔍 Generating symptom analysis', { symptoms: symptomDescriptions });
+            logWithTimestamp('Generating symptom analysis', { 
+                symptoms: symptomDescriptions,
+                count: symptoms.length 
+            });
 
-            // Use the enhanced symptom-specific prompt
             const response = await this.generateResponse(userQuery, SYMPTOM_SYSTEM_PROMPT);
-            
-            // Additional validation for symptom responses
-            if (response.length < 100) {
-                logWithTimestamp('⚠️ Symptom response too short, using enhanced fallback');
-                return `Thank you for sharing these symptoms with me - I understand how concerning it can be when your body feels different or unpredictable. The combination of ${symptomDescriptions} you're experiencing often suggests hormonal patterns that many women face, particularly those related to conditions like PCOS where multiple symptoms can appear together as your body responds to hormonal changes. You're definitely not alone in experiencing these concerns, and recognizing these patterns is actually an important step in understanding your health. I really encourage you to discuss these specific symptoms with a healthcare provider who can properly evaluate your situation and help you develop a personalized approach to addressing your concerns.`;
-            }
-            
             return response;
         } catch (error) {
-            logWithTimestamp('❌ Symptom analysis error', { error: error.message });
-            throw error;
+            logWithTimestamp('Symptom analysis error', { error: error.message });
+            return PERFECT_SYMPTOM_FALLBACK;
         }
     }
 }
 
 class AzureTTSService {
-    // Available voice configurations
     static VOICE_CONFIGS = [
         {
             name: "Aria (Friendly Female)",
@@ -328,9 +325,8 @@ class AzureTTSService {
 
     static async testConnection() {
         try {
-            logWithTimestamp('🔍 Testing Azure TTS connection...');
+            logWithTimestamp('Testing Azure TTS connection...');
             
-            // Test the voices endpoint
             const testEndpoint = `https://${AZURE_SPEECH_REGION}.tts.speech.microsoft.com/cognitiveservices/voices/list`;
             
             const response = await fetch(testEndpoint, {
@@ -341,71 +337,39 @@ class AzureTTSService {
             });
 
             if (response.ok) {
-                logWithTimestamp('✅ Azure TTS connection successful');
+                logWithTimestamp('Azure TTS connection successful');
                 return true;
-            } else if (response.status === 401) {
-                logWithTimestamp('❌ Azure authentication failed - check API key');
-                return false;
-            } else if (response.status === 403) {
-                logWithTimestamp('❌ Azure access forbidden - check subscription permissions');
-                return false;
             } else {
-                logWithTimestamp('⚠️ Azure connection test failed', { 
+                logWithTimestamp('Azure connection test failed', { 
                     status: response.status,
                     statusText: response.statusText 
                 });
                 return false;
             }
         } catch (error) {
-            logWithTimestamp('⚠️ Azure connection test error', { error: error.message });
+            logWithTimestamp('Azure connection test error', { error: error.message });
             return false;
         }
     }
 
     static async generateSpeech(text, voiceIndex = 0) {
         try {
-            logWithTimestamp('🎤 Starting Azure TTS generation...');
+            logWithTimestamp('Starting Azure TTS generation...');
             
-            // Sanitize and validate text
             const sanitizedText = text.trim();
             
-            // Check for empty or very short text
             if (!sanitizedText || sanitizedText.length < 5) {
-                logWithTimestamp('⚠️ Text too short for TTS generation', { 
-                    originalLength: text.length,
-                    sanitizedLength: sanitizedText.length,
-                    text: sanitizedText
-                });
                 throw new Error('Text is too short for audio generation');
             }
             
-            // Limit text length for TTS
             const processedText = sanitizedText.substring(0, 1000);
-            
-            logWithTimestamp('📝 Processing text', { 
-                originalLength: text.length, 
-                processedLength: processedText.length,
-                preview: processedText.substring(0, 50) + '...'
-            });
-
-            // Choose voice configuration
             const selectedVoice = this.VOICE_CONFIGS[voiceIndex] || this.VOICE_CONFIGS[0];
             
-            logWithTimestamp('🎵 Selected voice configuration', { 
-                voice: selectedVoice.name,
-                voiceName: selectedVoice.voiceName 
-            });
-
-            // Generate SSML for better speech quality
             const ssml = this.generateSSML(processedText, selectedVoice);
-            
-            // Call Azure TTS API
             const audioBuffer = await this.callAzureTTS(ssml);
-            
-            // Convert to base64 for transmission
             const audioBase64 = audioBuffer.toString('base64');
             
-            logWithTimestamp('✅ Azure TTS generation completed successfully!');
+            logWithTimestamp('Azure TTS generation completed successfully!');
             return {
                 audioData: audioBase64,
                 mimeType: 'audio/wav',
@@ -413,13 +377,12 @@ class AzureTTSService {
             };
 
         } catch (error) {
-            logWithTimestamp('❌ Azure TTS service error', { error: error.message });
+            logWithTimestamp('Azure TTS service error', { error: error.message });
             throw new Error(`Azure TTS generation failed: ${error.message}`);
         }
     }
 
     static generateSSML(text, voiceConfig) {
-        // Enhanced SSML with better prosody for health information
         const ssml = `
             <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">
                 <voice name="${voiceConfig.voiceName}">
@@ -446,8 +409,6 @@ class AzureTTSService {
         try {
             const endpoint = `https://${AZURE_SPEECH_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`;
             
-            logWithTimestamp('📤 Sending TTS request to Azure');
-            
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
@@ -461,10 +422,6 @@ class AzureTTSService {
 
             if (!response.ok) {
                 const errorText = await response.text();
-                logWithTimestamp('❌ Azure TTS request failed', { 
-                    status: response.status,
-                    response: errorText.substring(0, 300)
-                });
                 throw new Error(`Azure TTS API Error: ${response.status} - ${errorText}`);
             }
 
@@ -474,31 +431,11 @@ class AzureTTSService {
                 throw new Error('Empty audio response from Azure TTS');
             }
 
-            logWithTimestamp('✅ TTS request successful', { 
-                audioSize: `${Math.round(audioBuffer.length / 1024)}KB` 
-            });
-            
             return audioBuffer;
 
         } catch (error) {
-            logWithTimestamp('❌ Failed to call Azure TTS API', { error: error.message });
+            logWithTimestamp('Failed to call Azure TTS API', { error: error.message });
             throw error;
-        }
-    }
-
-    static async generateSpeechWithFallback(text) {
-        try {
-            return await this.generateSpeech(text, 0);
-        } catch (error) {
-            logWithTimestamp('❌ Primary TTS failed, trying with alternative voice...');
-            
-            // Try with alternative voice
-            try {
-                return await this.generateSpeech(text.substring(0, 800), 1);
-            } catch (fallbackError) {
-                logWithTimestamp('❌ All TTS attempts failed', { error: fallbackError.message });
-                throw new Error(`All TTS attempts failed: ${fallbackError.message}`);
-            }
         }
     }
 }
@@ -506,7 +443,7 @@ class AzureTTSService {
 // Fallback service
 class FallbackResponseService {
     static async generateFallbackResponse(text, type = 'general') {
-        logWithTimestamp(`⚠️ Using fallback response (text-only) for ${type} mode`);
+        logWithTimestamp(`Using fallback response (text-only) for ${type} mode`);
         return {
             audioData: null,
             text: text,
@@ -524,7 +461,6 @@ app.post('/api/chat', async (req, res) => {
     try {
         const { text: userInput, mode = 'general' } = req.body;
 
-        // Validate input
         if (!userInput || typeof userInput !== 'string' || userInput.trim().length === 0) {
             return res.status(400).json({
                 success: false,
@@ -532,22 +468,18 @@ app.post('/api/chat', async (req, res) => {
             });
         }
 
-        // Sanitize input
         const sanitizedInput = userInput.trim().substring(0, 500);
-        logWithTimestamp('📥 Processing general chat request', { 
+        logWithTimestamp('Processing general chat request', { 
             inputLength: sanitizedInput.length,
             mode: mode,
-            preview: sanitizedInput.substring(0, 100) + (sanitizedInput.length > 100 ? '...' : '')
+            preview: sanitizedInput.substring(0, 50)
         });
 
-        // Step 1: Generate AI response
         const aiText = await OpenRouterService.generateResponse(sanitizedInput, GENERAL_SYSTEM_PROMPT);
 
-        // Step 2: Generate audio response
         let audioResponse;
         
         try {
-            logWithTimestamp('🎤 Attempting Azure TTS generation for general chat...');
             const ttsResult = await AzureTTSService.generateSpeech(aiText);
             
             audioResponse = {
@@ -560,17 +492,18 @@ app.post('/api/chat', async (req, res) => {
                 mode: 'general'
             };
             
-            logWithTimestamp('✅ Azure TTS generation successful for general chat');
-            
         } catch (ttsError) {
-            logWithTimestamp('❌ Azure TTS failed for general chat, using fallback', { error: ttsError.message });
+            logWithTimestamp('Azure TTS failed for general chat, using fallback', { error: ttsError.message });
             audioResponse = await FallbackResponseService.generateFallbackResponse(aiText, 'general');
         }
 
         const processingTime = Date.now() - startTime;
-        logWithTimestamp(`🎯 General chat request completed`, { processingTime: `${processingTime}ms` });
+        logWithTimestamp(`General chat request completed`, { 
+            processingTime: `${processingTime}ms`,
+            responseLength: aiText.length,
+            wordCount: aiText.split(/\s+/).length
+        });
 
-        // Send response
         res.json({
             success: true,
             data: {
@@ -581,13 +514,17 @@ app.post('/api/chat', async (req, res) => {
                 voiceName: audioResponse.voiceName,
                 mimeType: audioResponse.mimeType,
                 mode: audioResponse.mode,
-                processingTime
+                processingTime,
+                stats: {
+                    wordCount: aiText.split(/\s+/).length,
+                    sentenceCount: aiText.split(/[.!?]+/).filter(s => s.trim().length > 0).length
+                }
             }
         });
 
     } catch (error) {
         const processingTime = Date.now() - startTime;
-        logWithTimestamp('❌ General chat request failed', { 
+        logWithTimestamp('General chat request failed', { 
             error: error.message, 
             processingTime: `${processingTime}ms`
         });
@@ -600,14 +537,13 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
-// New Symptom Checker endpoint
+// Symptom Checker endpoint
 app.post('/api/symptom-check', async (req, res) => {
     const startTime = Date.now();
     
     try {
         const { symptoms } = req.body;
 
-        // Validate input
         if (!symptoms || !Array.isArray(symptoms) || symptoms.length === 0) {
             return res.status(400).json({
                 success: false,
@@ -615,7 +551,6 @@ app.post('/api/symptom-check', async (req, res) => {
             });
         }
 
-        // Sanitize and validate symptoms
         const validSymptoms = symptoms.filter(symptom => 
             typeof symptom === 'string' && SYMPTOM_DESCRIPTIONS.hasOwnProperty(symptom)
         );
@@ -627,21 +562,17 @@ app.post('/api/symptom-check', async (req, res) => {
             });
         }
 
-        logWithTimestamp('🔍 Processing symptom check request', { 
+        logWithTimestamp('Processing symptom check request', { 
             totalSymptoms: symptoms.length,
             validSymptoms: validSymptoms.length,
             symptoms: validSymptoms
         });
 
-        // Step 1: Generate symptom analysis
         const aiText = await OpenRouterService.generateSymptomResponse(validSymptoms);
 
-        // Step 2: Generate audio response with specialized voice for medical content
         let audioResponse;
         
         try {
-            logWithTimestamp('🎤 Attempting Azure TTS generation for symptom analysis...');
-            // Use more gentle voice (Sara) for symptom analysis
             const ttsResult = await AzureTTSService.generateSpeech(aiText, 2);
             
             audioResponse = {
@@ -655,21 +586,20 @@ app.post('/api/symptom-check', async (req, res) => {
                 analyzedSymptoms: validSymptoms
             };
             
-            logWithTimestamp('✅ Azure TTS generation successful for symptom analysis');
-            
         } catch (ttsError) {
-            logWithTimestamp('❌ Azure TTS failed for symptom analysis, using fallback', { error: ttsError.message });
+            logWithTimestamp('Azure TTS failed for symptom analysis, using fallback', { error: ttsError.message });
             audioResponse = await FallbackResponseService.generateFallbackResponse(aiText, 'symptom');
             audioResponse.analyzedSymptoms = validSymptoms;
         }
 
         const processingTime = Date.now() - startTime;
-        logWithTimestamp(`🎯 Symptom check request completed`, { 
+        logWithTimestamp(`Symptom check request completed`, { 
             processingTime: `${processingTime}ms`,
-            symptomsAnalyzed: validSymptoms.length
+            symptomsAnalyzed: validSymptoms.length,
+            responseLength: aiText.length,
+            wordCount: aiText.split(/\s+/).length
         });
 
-        // Send response
         res.json({
             success: true,
             data: {
@@ -681,13 +611,18 @@ app.post('/api/symptom-check', async (req, res) => {
                 mimeType: audioResponse.mimeType,
                 mode: audioResponse.mode,
                 analyzedSymptoms: audioResponse.analyzedSymptoms,
-                processingTime
+                processingTime,
+                stats: {
+                    wordCount: aiText.split(/\s+/).length,
+                    sentenceCount: aiText.split(/[.!?]+/).filter(s => s.trim().length > 0).length,
+                    symptomsCount: validSymptoms.length
+                }
             }
         });
 
     } catch (error) {
         const processingTime = Date.now() - startTime;
-        logWithTimestamp('❌ Symptom check request failed', { 
+        logWithTimestamp('Symptom check request failed', { 
             error: error.message, 
             processingTime: `${processingTime}ms`
         });
@@ -703,7 +638,6 @@ app.post('/api/symptom-check', async (req, res) => {
 // Health check endpoint
 app.get('/api/health', async (req, res) => {
     try {
-        // Test Azure connection
         const azureConnection = await AzureTTSService.testConnection();
 
         res.json({
@@ -719,133 +653,18 @@ app.get('/api/health', async (req, res) => {
                 symptomChecker: true,
                 audioTTS: azureConnection
             },
+            optimization: {
+                responseValidation: true,
+                perfectFallbacks: true,
+                optimizedPrompts: true
+            },
             region: AZURE_SPEECH_REGION,
-            version: '3.1.0'
+            version: '5.0.0'
         });
     } catch (error) {
         res.json({
             status: 'partial',
             timestamp: new Date().toISOString(),
-            services: {
-                openrouter: !!OPENROUTER_API_KEY,
-                azure: !!AZURE_SPEECH_KEY && !!AZURE_SPEECH_REGION,
-                azureConnection: false
-            },
-            features: {
-                generalChat: true,
-                symptomChecker: true,
-                audioTTS: false
-            },
-            error: error.message
-        });
-    }
-});
-
-// Test endpoint for symptom checker
-app.post('/api/test-symptom-check', async (req, res) => {
-    try {
-        const testSymptoms = req.body.symptoms || ['irregular_periods', 'acne', 'weight_gain'];
-        
-        logWithTimestamp('🧪 Running test symptom check request...');
-        
-        // Generate symptom analysis
-        const aiText = await OpenRouterService.generateSymptomResponse(testSymptoms);
-        
-        // Try Azure TTS generation
-        const ttsResult = await AzureTTSService.generateSpeech(aiText, 2);
-        
-        res.json({
-            success: true,
-            message: 'Symptom check test completed successfully',
-            data: {
-                testSymptoms: testSymptoms,
-                symptomDescriptions: testSymptoms.map(s => SYMPTOM_DESCRIPTIONS[s] || s),
-                aiResponse: aiText,
-                audioData: ttsResult.audioData,
-                service: 'azure-tts',
-                voiceName: ttsResult.voiceName
-            }
-        });
-        
-    } catch (error) {
-        logWithTimestamp('❌ Test symptom check failed', { error: error.message });
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-// Test endpoint for Azure TTS
-app.get('/api/test-azure', async (req, res) => {
-    try {
-        logWithTimestamp('🧪 Testing Azure TTS connection and configuration...');
-        
-        const connectionTest = await AzureTTSService.testConnection();
-        
-        if (!connectionTest) {
-            throw new Error('Azure TTS connection test failed');
-        }
-        
-        res.json({
-            success: true,
-            message: 'Azure TTS connection test successful',
-            data: {
-                region: AZURE_SPEECH_REGION,
-                availableVoices: AzureTTSService.VOICE_CONFIGS.map(voice => ({
-                    name: voice.name,
-                    voiceName: voice.voiceName,
-                    style: voice.style,
-                    gender: voice.gender
-                })),
-                connectionStatus: 'active',
-                features: {
-                    generalMode: 'Aria - Cheerful voice for general conversations',
-                    symptomMode: 'Sara - Gentle voice for symptom analysis'
-                }
-            }
-        });
-    } catch (error) {
-        logWithTimestamp('❌ Azure TTS test failed', { error: error.message });
-        res.status(500).json({
-            success: false,
-            error: error.message,
-            region: AZURE_SPEECH_REGION,
-            keyPresent: !!AZURE_SPEECH_KEY
-        });
-    }
-});
-
-// Test chat endpoint (for development)
-app.post('/api/test-chat', async (req, res) => {
-    try {
-        const testText = req.body.text || "Hello! This is a test message for the She Nurtures AI assistant in general mode.";
-        
-        logWithTimestamp('🧪 Running test chat request...');
-        
-        // Generate AI response
-        const aiText = await OpenRouterService.generateResponse(testText);
-        
-        // Try Azure TTS generation with shorter text for testing
-        const ttsResult = await AzureTTSService.generateSpeech(aiText.substring(0, 200));
-        
-        res.json({
-            success: true,
-            message: 'Test completed successfully',
-            data: {
-                originalText: testText,
-                aiResponse: aiText,
-                audioData: ttsResult.audioData,
-                service: 'azure-tts',
-                voiceName: ttsResult.voiceName,
-                mode: 'general'
-            }
-        });
-        
-    } catch (error) {
-        logWithTimestamp('❌ Test chat failed', { error: error.message });
-        res.status(500).json({
-            success: false,
             error: error.message
         });
     }
@@ -908,7 +727,7 @@ app.get('/api/symptoms', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-    logWithTimestamp('❌ Unhandled error', { error: err.message, stack: err.stack });
+    logWithTimestamp('Unhandled error', { error: err.message, stack: err.stack });
     res.status(500).json({
         success: false,
         error: 'An unexpected error occurred'
@@ -931,10 +750,7 @@ app.use('/api', (req, res, next) => {
                 'GET /api/health',
                 'POST /api/chat',
                 'POST /api/symptom-check',
-                'GET /api/symptoms',
-                'GET /api/test-azure',
-                'POST /api/test-chat',
-                'POST /api/test-symptom-check'
+                'GET /api/symptoms'
             ]
         });
     }
@@ -944,27 +760,26 @@ app.use('/api', (req, res, next) => {
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
-    logWithTimestamp(`🚀 She Nurtures AI server running on port ${PORT}`);
-    logWithTimestamp('🔧 Environment check:', {
+    logWithTimestamp(`She Nurtures AI server running on port ${PORT}`);
+    logWithTimestamp('Environment check:', {
         nodeEnv: process.env.NODE_ENV || 'development',
         port: PORT,
-        openRouterKey: OPENROUTER_API_KEY ? '✅ Set' : '❌ Missing',
-        azureKey: AZURE_SPEECH_KEY ? '✅ Set' : '❌ Missing',
-        azureRegion: AZURE_SPEECH_REGION || '❌ Missing'
+        openRouterKey: OPENROUTER_API_KEY ? 'Set' : 'Missing',
+        azureKey: AZURE_SPEECH_KEY ? 'Set' : 'Missing',
+        azureRegion: AZURE_SPEECH_REGION || 'Missing'
     });
     
-    // Test Azure connection on startup
     try {
         const azureTest = await AzureTTSService.testConnection();
         if (azureTest) {
-            logWithTimestamp('✅ Azure TTS service ready and connected');
-            console.log('🎤 Voice Configuration Ready');
+            logWithTimestamp('Azure TTS service ready and connected');
         } else {
-            logWithTimestamp('⚠️ Azure TTS service connection issue - check credentials');
+            logWithTimestamp('Azure TTS service connection issue - check credentials');
         }
     } catch (error) {
-        logWithTimestamp('⚠️ Azure TTS startup test failed', { error: error.message });
+        logWithTimestamp('Azure TTS startup test failed', { error: error.message });
     }
     
-    logWithTimestamp('🌸 She Nurtures AI is ready with enhanced prompts!');
+    logWithTimestamp('✨ She Nurtures AI is ready - OPTIMIZED for perfect responses! ✨');
+    logWithTimestamp('🎯 Response targets: General (60-90 words), Symptoms (70-100 words)');
 });
