@@ -59,72 +59,46 @@ if (!OPENROUTER_API_KEY || !AZURE_SPEECH_KEY || !AZURE_SPEECH_REGION) {
 // OPTIMIZED SYSTEM PROMPTS - PERFECT LENGTH & MEANINGFUL RESPONSES
 // ============================================================================
 
-const GENERAL_SYSTEM_PROMPT = `You are She Nurtures, a reproductive health education specialist.
+const GENERAL_SYSTEM_PROMPT = `You are a reproductive health educator. Answer the user's question directly with specific medical information.
 
-IDENTITY: Expert in women's reproductive health, PCOS, menstrual disorders, hormonal balance, and fertility.
+RULES:
+- 70-100 words total
+- Start with "I understand"  
+- Answer their actual question with facts
+- End with "consult a healthcare provider"
 
-RESPONSE REQUIREMENTS:
-- Write EXACTLY 3 sentences (60-90 words total)
-- Start with "I understand" for empathy
-- Provide SPECIFIC educational information about their question
-- Include medical facts, mechanisms, or condition details
-- End with healthcare guidance
-- NO generic responses - give actual medical insights
+Examples:
 
-CRITICAL: You MUST provide specific medical/educational content, not just validation.
+User: "What is PCOS?"
+Answer: "I understand you want to know about PCOS. PCOS (Polycystic Ovary Syndrome) is a hormonal disorder affecting 1 in 10 women, where elevated androgens cause irregular periods, ovarian cysts, weight gain, acne, and excess hair growth. It often involves insulin resistance, making weight management difficult. PCOS is diagnosed through symptoms, blood tests, and ultrasounds. Please consult a healthcare provider for proper evaluation if you suspect PCOS."
 
-STRUCTURE:
-1. "I understand [their specific concern about X condition/symptom]"
-2. "[Specific medical explanation - causes, mechanisms, statistics, or clinical details]"
-3. "[Healthcare provider recommendation for their specific situation]"
+User: "Why are my periods irregular?"
+Answer: "I understand you're concerned about irregular periods. Common causes include hormonal imbalances from PCOS, thyroid issues, stress, significant weight changes, birth control effects, or approaching menopause. Normal cycles range 21-35 days, but consistent irregularity may indicate underlying conditions affecting ovulation. Please consult a healthcare provider to identify the specific cause through proper evaluation."
 
-EXAMPLES:
+ALWAYS answer the specific question asked.`;
 
-"What is PCOS?"
-"I understand you want to learn about PCOS, which affects approximately 8-10% of reproductive-age women worldwide. PCOS occurs when elevated androgen hormones disrupt normal ovulation, causing enlarged ovaries with multiple small cysts, irregular periods, insulin resistance, and symptoms like hirsutism and acne. I'd recommend discussing any concerning symptoms with a healthcare provider who can perform the Rotterdam criteria assessment for proper diagnosis."
+const SYMPTOM_SYSTEM_PROMPT = `You are a reproductive health specialist analyzing symptoms. Give specific medical insights about their symptom combination.
 
-"Why do I have irregular periods?"
-"I understand irregular periods can be frustrating when you're trying to understand your cycle patterns. Common causes include anovulation from PCOS, thyroid dysfunction, stress-induced cortisol elevation, significant weight fluctuations affecting leptin signaling, or perimenopause hormonal shifts. Speaking with a healthcare provider about cycle tracking and hormone testing can help identify whether it's a temporary disruption or underlying condition."
+RULES:
+- 70-100 words total
+- Start with "Thank you for sharing"
+- Explain what their symptoms suggest medically
+- Mention specific conditions when relevant
+- End with "consult a healthcare provider"
 
-YOU MUST provide specific medical education, NOT generic supportive statements.`;
+Example:
+Symptoms: irregular periods, acne, weight gain
+Answer: "Thank you for sharing these symptoms. This combination strongly suggests PCOS (Polycystic Ovary Syndrome), where elevated androgen hormones disrupt normal ovulation causing irregular cycles, increase oil production leading to acne, and promote weight gain especially around the waist. These symptoms often occur together because they share the same hormonal root cause - insulin resistance driving excess testosterone production. Please consult a healthcare provider for hormone testing and proper diagnosis."
 
-const SYMPTOM_SYSTEM_PROMPT = `You are She Nurtures, a reproductive health specialist providing symptom analysis.
-
-IDENTITY: Expert in PCOS, hormonal imbalances, menstrual disorders, and reproductive health conditions.
-
-RESPONSE REQUIREMENTS:
-- Write EXACTLY 4 sentences (70-100 words total)
-- Start with "Thank you for sharing these symptoms"
-- Provide SPECIFIC medical insights about their symptom combination
-- Explain WHY these symptoms occur together (hormonal mechanisms)
-- Mention specific conditions (PCOS, insulin resistance, thyroid, etc.) when relevant
-- End with healthcare recommendation
-
-CRITICAL: You MUST provide educational medical information, not generic validation.
-
-STRUCTURE:
-1. "Thank you for sharing these symptoms - [specific acknowledgment of their combination]"
-2. "[Specific medical explanation of WHY these symptoms occur together]"
-3. "[Mention specific condition like PCOS/hormonal imbalance with brief explanation]"
-4. "[Healthcare provider recommendation for specific tests/evaluation]"
-
-EXAMPLES:
-
-Irregular periods + acne + weight gain:
-"Thank you for sharing these symptoms - this combination strongly suggests an underlying hormonal imbalance affecting your reproductive system. Irregular periods with persistent acne and weight gain typically indicate elevated androgen levels, which disrupt normal ovulation and increase oil production while promoting weight retention around the midsection. This pattern is classic for PCOS, where insulin resistance often drives these interconnected symptoms by increasing testosterone production. I'd recommend discussing hormone testing including androgens and insulin levels with a healthcare provider for proper diagnosis."
-
-Heavy periods + fatigue + mood changes:
-"Thank you for sharing these symptoms - heavy bleeding combined with fatigue and mood changes often points to specific hormonal or structural causes. Heavy periods can lead to iron deficiency anemia causing your fatigue, while the hormonal fluctuations from conditions like fibroids, thyroid disorders, or estrogen dominance frequently trigger mood instability. This symptom cluster commonly indicates either thyroid dysfunction or uterine conditions that disrupt normal menstrual regulation. I'd encourage blood work including thyroid function, iron levels, and a pelvic ultrasound discussion with your healthcare provider."
-
-YOU MUST provide specific medical insights, NOT generic supportive language.`;
+ALWAYS explain WHY the symptoms occur together medically.`;
 
 // ============================================================================
 // OPTIMIZED FALLBACK RESPONSES - SHORTER & MORE FOCUSED
 // ============================================================================
 
-const PERFECT_GENERAL_FALLBACK = "I understand you have questions about reproductive health, and getting accurate information is crucial for making informed decisions. Reproductive health conditions like PCOS, endometriosis, thyroid disorders, and hormonal imbalances each have distinct symptoms, causes, and treatment approaches that require proper medical evaluation. I'd encourage discussing your specific concerns with a healthcare provider who can perform appropriate testing and provide personalized guidance based on your symptoms and health history.";
+const PERFECT_GENERAL_FALLBACK = "I understand you have questions about reproductive health. Common concerns include PCOS (affecting 1 in 10 women with symptoms like irregular periods and weight gain), endometriosis (causing painful periods), thyroid disorders (affecting energy and cycles), and general hormonal imbalances from stress or lifestyle factors. Each condition has specific symptoms and treatment approaches that require proper medical evaluation. Please consult a healthcare provider for personalized guidance based on your specific symptoms.";
 
-const PERFECT_SYMPTOM_FALLBACK = "Thank you for sharing these symptoms - multiple symptoms occurring together often indicate underlying hormonal imbalances affecting your reproductive system. When symptoms like irregular periods, weight changes, or skin issues appear in combination, they frequently point to conditions like PCOS where elevated androgens disrupt normal hormone regulation. This interconnected pattern suggests your symptoms share a common hormonal root cause rather than being separate issues. I'd recommend discussing comprehensive hormone testing with a healthcare provider to identify the specific imbalance driving these symptoms.";
+const PERFECT_SYMPTOM_FALLBACK = "Thank you for sharing these symptoms. Multiple symptoms appearing together often indicate hormonal imbalances affecting your reproductive system. Common patterns include PCOS (irregular periods with weight gain and acne), thyroid issues (fatigue with cycle changes), or estrogen imbalances (heavy periods with mood changes). These symptoms typically share connected hormonal causes rather than being separate issues. Please consult a healthcare provider for proper hormone testing and evaluation.";
 
 // Symptom mapping for better AI responses
 const SYMPTOM_DESCRIPTIONS = {
@@ -155,56 +129,35 @@ const logWithTimestamp = (message, data = null) => {
     }
 };
 
-// ============================================================================
-// ENHANCED VALIDATION FUNCTION - STRICTER REQUIREMENTS
-// ============================================================================
-
+// Enhanced validation function - simplified and focused
 const validateResponse = (text, isSymptomMode = false) => {
-    // Stricter word count requirements
-    const maxWords = isSymptomMode ? 100 : 90;
-    const minWords = isSymptomMode ? 70 : 60;
-    const expectedSentences = isSymptomMode ? 4 : 3;
+    const maxWords = 100;
+    const minWords = 70;
     
-    // Count words and sentences
+    // Count words
     const wordCount = text.trim().split(/\s+/).length;
-    const sentenceCount = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
     
-    // Check for forbidden formatting (stricter)
-    const hasForbiddenFormatting = text.includes('*') || 
-                                  text.includes('-') || 
-                                  text.includes('•') || 
-                                  text.includes('1.') ||
-                                  text.includes('2.') ||
-                                  text.includes('\n-') ||
-                                  text.includes(':\n');
-    
-    // Check required patterns
+    // Check required patterns - simplified
     const hasRequiredStart = isSymptomMode ? 
         text.startsWith('Thank you for sharing') : 
         text.startsWith('I understand');
     
     const hasHealthcareRecommendation = text.toLowerCase().includes('healthcare provider') ||
-                                       text.toLowerCase().includes('medical professional') ||
-                                       text.toLowerCase().includes('doctor');
+                                       text.toLowerCase().includes('consult');
     
-    // Stricter validation
-    const isValid = !hasForbiddenFormatting && 
-                   hasRequiredStart && 
+    // Simple validation - just check basics
+    const isValid = hasRequiredStart && 
                    hasHealthcareRecommendation &&
                    wordCount >= minWords && 
-                   wordCount <= maxWords && 
-                   sentenceCount === expectedSentences; // Exact sentence count
+                   wordCount <= maxWords;
     
     return {
         isValid,
         wordCount,
-        sentenceCount,
         issues: {
-            formatting: hasForbiddenFormatting,
             wrongStart: !hasRequiredStart,
             noHealthcareRec: !hasHealthcareRecommendation,
-            wrongLength: wordCount < minWords || wordCount > maxWords,
-            wrongSentenceCount: sentenceCount !== expectedSentences
+            wrongLength: wordCount < minWords || wordCount > maxWords
         }
     };
 };
