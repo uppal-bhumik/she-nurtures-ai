@@ -179,7 +179,7 @@ class OpenRouterService {
                     "X-Title": "She Nurtures AI Assistant"
                 },
                 body: JSON.stringify({
-                    model: "moonshotai/kimi-k2:free",
+                    model: "mistralai/mistral-small-3.2-24b-instruct:free",
                     messages: [
                         { role: "system", content: systemPrompt },
                         { role: "user", content: userInput }
