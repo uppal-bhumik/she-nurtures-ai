@@ -179,7 +179,7 @@ class OpenRouterService {
                     "X-Title": "She Nurtures AI Assistant"
                 },
                 body: JSON.stringify({
-                    model: "google/gemma-2-9b-it:free",
+                    model: "deepseek/deepseek-chat-v3.1:free",
                     messages: [
                         { role: "system", content: systemPrompt },
                         { role: "user", content: userInput }
