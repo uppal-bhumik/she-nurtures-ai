@@ -59,47 +59,46 @@ if (!OPENROUTER_API_KEY || !AZURE_SPEECH_KEY || !AZURE_SPEECH_REGION) {
 // OPTIMIZED SYSTEM PROMPTS - PERFECT LENGTH & MEANINGFUL RESPONSES
 // ============================================================================
 
-const GENERAL_SYSTEM_PROMPT = `You are a compassionate reproductive health educator. Follow these rules EXACTLY:
+const GENERAL_SYSTEM_PROMPT = `You are a reproductive health educator. Answer the user's question directly with specific medical information.
 
-MANDATORY FORMAT:
-1. First sentence MUST start with "I understand" followed by their concern
-2. Provide 2-3 sentences of specific medical facts (50-80 words)
-3. Last sentence MUST include "consult a healthcare provider"
-4. Total response: 60-100 words
-5. NO bullet points, NO lists, NO extra formatting
+RULES:
+- 70-100 words total
+- Start with "I understand"  
+- Answer their actual question with facts
+- End with "consult a healthcare provider"
 
 Examples:
 
 User: "What is PCOS?"
-You MUST respond: "I understand you want to know about PCOS. PCOS (Polycystic Ovary Syndrome) is a hormonal disorder affecting 1 in 10 women, where elevated androgens cause irregular periods, ovarian cysts, weight gain, acne, and excess hair growth. It often involves insulin resistance, making weight management difficult. Please consult a healthcare provider for proper evaluation if you suspect PCOS."
+Answer: "I understand you want to know about PCOS. PCOS (Polycystic Ovary Syndrome) is a hormonal disorder affecting 1 in 10 women, where elevated androgens cause irregular periods, ovarian cysts, weight gain, acne, and excess hair growth. It often involves insulin resistance, making weight management difficult. PCOS is diagnosed through symptoms, blood tests, and ultrasounds. Please consult a healthcare provider for proper evaluation if you suspect PCOS."
 
-User: "I am experiencing like vomiting"
-You MUST respond: "I understand you're experiencing nausea and vomiting. While this can have many causes including pregnancy, hormonal changes, digestive issues, or infections, persistent vomiting requires medical attention to determine the underlying cause and prevent dehydration. Please consult a healthcare provider immediately if symptoms continue or worsen, especially if accompanied by severe pain or fever."
+User: "Why are my periods irregular?"
+Answer: "I understand you're concerned about irregular periods. Common causes include hormonal imbalances from PCOS, thyroid issues, stress, significant weight changes, birth control effects, or approaching menopause. Normal cycles range 21-35 days, but consistent irregularity may indicate underlying conditions affecting ovulation. Please consult a healthcare provider to identify the specific cause through proper evaluation."
 
-CRITICAL: Your first word MUST be "I" and second word MUST be "understand". Do not start with commas, greetings, or any other words.`;
+ALWAYS answer the specific question asked.`;
 
-const SYMPTOM_SYSTEM_PROMPT = `You are a compassionate reproductive health specialist. Follow these rules EXACTLY:
+const SYMPTOM_SYSTEM_PROMPT = `You are a reproductive health specialist analyzing symptoms. Give specific medical insights about their symptom combination.
 
-MANDATORY FORMAT:
-1. First sentence MUST start with "Thank you for sharing these symptoms"
-2. Provide 2-3 sentences explaining what these symptoms suggest medically (50-80 words)
-3. Last sentence MUST include "consult a healthcare provider"
-4. Total response: 70-100 words
-5. NO bullet points, NO lists, NO extra formatting
+RULES:
+- 70-100 words total
+- Start with "Thank you for sharing"
+- Explain what their symptoms suggest medically
+- Mention specific conditions when relevant
+- End with "consult a healthcare provider"
 
 Example:
 Symptoms: irregular periods, acne, weight gain
-You MUST respond: "Thank you for sharing these symptoms. This combination strongly suggests PCOS (Polycystic Ovary Syndrome), where elevated androgen hormones disrupt normal ovulation causing irregular cycles, increase oil production leading to acne, and promote weight gain especially around the waist. These symptoms often occur together because they share the same hormonal root cause involving insulin resistance. Please consult a healthcare provider for hormone testing and proper diagnosis."
+Answer: "Thank you for sharing these symptoms. This combination strongly suggests PCOS (Polycystic Ovary Syndrome), where elevated androgen hormones disrupt normal ovulation causing irregular cycles, increase oil production leading to acne, and promote weight gain especially around the waist. These symptoms often occur together because they share the same hormonal root cause - insulin resistance driving excess testosterone production. Please consult a healthcare provider for hormone testing and proper diagnosis."
 
-CRITICAL: Your first word MUST be "Thank" and you must follow with "you for sharing these symptoms". Do not start with any other words.`;
+ALWAYS explain WHY the symptoms occur together medically.`;
 
 // ============================================================================
 // OPTIMIZED FALLBACK RESPONSES - SHORTER & MORE FOCUSED
 // ============================================================================
 
-const PERFECT_GENERAL_FALLBACK = "I understand you have questions about reproductive health. Common concerns include PCOS affecting 1 in 10 women with irregular periods and weight gain, endometriosis causing painful periods, and thyroid disorders affecting energy and menstrual cycles. Each condition requires proper medical evaluation for accurate diagnosis and treatment. Please consult a healthcare provider who can assess your specific symptoms and medical history.";
+const PERFECT_GENERAL_FALLBACK = "I understand you have questions about reproductive health. Common concerns include PCOS (affecting 1 in 10 women with symptoms like irregular periods and weight gain), endometriosis (causing painful periods), thyroid disorders (affecting energy and cycles), and general hormonal imbalances from stress or lifestyle factors. Each condition has specific symptoms and treatment approaches that require proper medical evaluation. Please consult a healthcare provider for personalized guidance based on your specific symptoms.";
 
-const PERFECT_SYMPTOM_FALLBACK = "Thank you for sharing these symptoms. Multiple symptoms occurring together often indicate hormonal imbalances affecting your reproductive system. Common patterns include PCOS with irregular periods, weight gain and acne, or thyroid issues causing fatigue with cycle changes. These symptoms typically share connected hormonal causes requiring comprehensive evaluation. Please consult a healthcare provider for proper hormone testing and diagnosis.";
+const PERFECT_SYMPTOM_FALLBACK = "Thank you for sharing these symptoms. Multiple symptoms appearing together often indicate hormonal imbalances affecting your reproductive system. Common patterns include PCOS (irregular periods with weight gain and acne), thyroid issues (fatigue with cycle changes), or estrogen imbalances (heavy periods with mood changes). These symptoms typically share connected hormonal causes rather than being separate issues. Please consult a healthcare provider for proper hormone testing and evaluation.";
 
 // Symptom mapping for better AI responses
 const SYMPTOM_DESCRIPTIONS = {
@@ -130,27 +129,23 @@ const logWithTimestamp = (message, data = null) => {
     }
 };
 
-// Enhanced validation function - more lenient but still effective
+// Enhanced validation function - simplified and focused
 const validateResponse = (text, isSymptomMode = false) => {
-    const maxWords = 110; // Slightly increased tolerance
-    const minWords = 50;  // More lenient minimum
+    const maxWords = 100;
+    const minWords = 70;
     
     // Count words
     const wordCount = text.trim().split(/\s+/).length;
     
-    // Check required patterns - case insensitive and more flexible
-    const normalizedText = text.trim().toLowerCase();
-    
+    // Check required patterns - simplified
     const hasRequiredStart = isSymptomMode ? 
-        normalizedText.startsWith('thank you for sharing') : 
-        normalizedText.startsWith('i understand');
+        text.startsWith('Thank you for sharing') : 
+        text.startsWith('I understand');
     
-    const hasHealthcareRecommendation = normalizedText.includes('healthcare provider') ||
-                                       normalizedText.includes('consult a doctor') ||
-                                       normalizedText.includes('see a doctor') ||
-                                       normalizedText.includes('medical professional');
+    const hasHealthcareRecommendation = text.toLowerCase().includes('healthcare provider') ||
+                                       text.toLowerCase().includes('consult');
     
-    // More lenient validation
+    // Simple validation - just check basics
     const isValid = hasRequiredStart && 
                    hasHealthcareRecommendation &&
                    wordCount >= minWords && 
@@ -189,11 +184,11 @@ class OpenRouterService {
                         { role: "system", content: systemPrompt },
                         { role: "user", content: userInput }
                     ],
-                    temperature: 0.2,      // Very low for consistent formatting
-                    max_tokens: 200,       // Enough for 100 words + safety
-                    top_p: 0.5,           // Very focused responses
-                    frequency_penalty: 0.6, // Strong penalty against repetition
-                    presence_penalty: 0.5   // Encourage following format
+                    temperature: 0.3, // Reduced for more consistent responses
+                    max_tokens: 150,  // Reduced from 200
+                    top_p: 0.7,       // Reduced for more focused responses
+                    frequency_penalty: 0.4, // Increased to avoid repetition
+                    presence_penalty: 0.3
                 })
             });
 
@@ -210,33 +205,14 @@ class OpenRouterService {
 
             let aiText = data.choices[0].message.content.trim();
             
-            // Clean up the response more aggressively
+            // Clean up common formatting issues
             aiText = aiText
-                .replace(/^[,\s]+/, '')          // Remove leading commas and spaces
                 .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold formatting
                 .replace(/\*(.*?)\*/g, '$1')     // Remove italic formatting  
                 .replace(/\n\s*-\s*/g, ' ')      // Remove bullet points
                 .replace(/\n\s*\d+\.\s*/g, ' ')  // Remove numbered lists
                 .replace(/\s+/g, ' ')            // Normalize whitespace
                 .trim();
-            
-            // Fix common AI mistakes with starting
-            if (!aiText.match(/^(I understand|Thank you for sharing)/i)) {
-                logWithTimestamp('AI response has incorrect start, attempting to fix...');
-                
-                // Try to find and extract a good sentence
-                const sentences = aiText.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 0);
-                
-                // If we can salvage content, add proper prefix
-                if (sentences.length > 0 && sentences[0].length > 20) {
-                    const prefix = isSymptomMode ? 
-                        "Thank you for sharing these symptoms. " : 
-                        "I understand your concern. ";
-                    
-                    aiText = prefix + sentences.join('. ') + '.';
-                    aiText = aiText.substring(0, 500); // Ensure not too long
-                }
-            }
             
             logWithTimestamp('Raw AI response received', { 
                 textLength: aiText.length,
@@ -256,7 +232,8 @@ class OpenRouterService {
                 aiText = isSymptomMode ? PERFECT_SYMPTOM_FALLBACK : PERFECT_GENERAL_FALLBACK;
             } else {
                 logWithTimestamp('AI response passed validation', {
-                    wordCount: validation.wordCount
+                    wordCount: validation.wordCount,
+                    sentenceCount: validation.sentenceCount
                 });
             }
             
@@ -648,7 +625,7 @@ app.get('/api/health', async (req, res) => {
                 optimizedPrompts: true
             },
             region: AZURE_SPEECH_REGION,
-            version: '5.1.0'
+            version: '5.0.0'
         });
     } catch (error) {
         res.json({
@@ -770,6 +747,5 @@ app.listen(PORT, async () => {
     }
     
     logWithTimestamp('✨ She Nurtures AI is ready - OPTIMIZED for perfect responses! ✨');
-    logWithTimestamp('🎯 Response targets: General (60-100 words), Symptoms (70-100 words)');
-    logWithTimestamp('🔧 NEW: Auto-fix for incorrect AI response formats');
+    logWithTimestamp('🎯 Response targets: General (60-90 words), Symptoms (70-100 words)');
 });
